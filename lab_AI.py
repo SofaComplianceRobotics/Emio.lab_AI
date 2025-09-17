@@ -3,10 +3,10 @@ from modules.targets import Targets
 import Sofa
 import csv
 import numpy as np
-import pathlib
+import os
 
-resultsDirectory = "data/results/"
-
+resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
+STEP=10
 
 class TargetController(Sofa.Core.Controller):
     """
@@ -54,7 +54,8 @@ class TargetController(Sofa.Core.Controller):
     def getFilename(self):
         legname = self.emio.legsName[0]
         legmodel = self.emio.legsModel[0]
-        return resultsDirectory + legname + "_" + legmodel + '_sphere.csv'
+        count_positions = len(self.emio.getRoot().Modelling.SphereTargets.getMechanicalState().position.value)
+        return resultsDirectory + legname + "_"+ legmodel + '_sphere'+str(count_positions)+'.csv'
 
     def createCSVFile(self):
         """
@@ -103,7 +104,7 @@ def createScene(rootnode):
     # Add Emio to the scene
     emio = Emio(name="Emio",
                 legsName=["blueleg"],
-                legsModel=["tetra"],
+                legsModel=["beam"],
                 legsPositionOnMotor=["counterclockwisedown","clockwisedown","counterclockwisedown","clockwisedown"],
                 centerPartName="bluepart",
                 centerPartType="rigid",
@@ -117,7 +118,7 @@ def createScene(rootnode):
     emio.addObject(assembly)
 
     # Generation of the targets
-    spherePositions = Targets(ratio=0.1, center=[0, -130, 0], size=80).sphere()
+    spherePositions = Targets(ratio=0.05, center=[0, -130, 0], size=80).sphere()
     sphere = modelling.addChild("SphereTargets")
     sphere.addObject("MechanicalObject", position=spherePositions, showObject=True, showObjectScale=10, drawMode=0)
 
@@ -137,7 +138,7 @@ def createScene(rootnode):
                                         target=sphere, 
                                         effector=emio.effector.EffectorCoord, 
                                         assembly=assembly,
-                                        steps=10))
+                                        steps=STEP))
     
     # Add depth camera tracker (distributed with Emio) 
     # rootnode.addObject(DotTracker(name="DotTracker",

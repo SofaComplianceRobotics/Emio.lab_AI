@@ -1,5 +1,7 @@
 from modules.targets import Targets
+from AI_models import PytorchMLPReg, r2_score_numpy
 import Sofa
+import Sofa.ImGui as MyGui
 import csv
 from math import pi
 
@@ -10,10 +12,10 @@ import pandas as pd
 import numpy as np
 import ast
 import re
+import os
 
-
-resultsDirectory = "data/results/"
-STEP=10
+resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
+STEP=25
 
 class TargetController(Sofa.Core.Controller):
     """
@@ -39,38 +41,32 @@ class TargetController(Sofa.Core.Controller):
 
         self.animationSteps = steps 
         self.animationStep = self.animationSteps
-        #self.createCSVFile()
+        self.index = 0
+        
 
-        #entrainement du MLP
+        #### Plotting the error ####
+        self.addData(name="error", type="float", value=0)
+        self.addData(name="errorX", type="float", value=0)
+        self.addData(name="errorY", type="float", value=0)
+        self.addData(name="errorZ", type="float", value=0)
+        self.addData(name="r2", type="float", value=0)
+        MyGui.PlottingWindow.addData("error", self.error)
+        MyGui.PlottingWindow.addData("errorX", self.errorX)
+        MyGui.PlottingWindow.addData("errorY", self.errorY)
+        MyGui.PlottingWindow.addData("errorZ", self.errorZ)
+        MyGui.PlottingWindow.addData("r2", self.r2)
 
-        #Creation du dataset
+        #### MLP Training ####
 
-        df_data_raw= pd.read_csv('./data/results/blueleg_tetra_sphere.csv', delimiter=';', skiprows=8)
+        # Scikit-learn MLP
+        # self.regr = MLPRegressor(random_state=1,hidden_layer_sizes=(128,128,),activation = "logistic",max_iter=20000)#for small datasets solver ="lbfgs"
+        # self.regr.fit(X_train, y_train)
 
-
-        # Shuffle the dataframe
-        df_shuffled = df_data_raw.sample(frac=1.0, random_state=42) # Added random_state for reproducibility
-
-        # Split the dataframe into training and test sets
-        train_size = 0.8
-        df_data_training, df_data_test = train_test_split(df_shuffled, train_size=train_size, random_state=42) # Added random_state for reproducibility
-
-        # Function to clean and evaluate the string representation of lists
-        def clean_and_eval_list_string(list_string):
-            # Add commas between numbers in the string
-            cleaned_string = re.sub(r'(?<=\d)\s+(?=[-\d])', ',', list_string)
-            return ast.literal_eval(cleaned_string)
-
-        # Separate features (X) and target (y) for both training and test sets
-        X_train = np.array([clean_and_eval_list_string(pos) for pos in df_data_training['Effector position'].tolist()])
-        y_train = np.array([clean_and_eval_list_string(angle) for angle in df_data_training['Motor angle'].tolist()])
-
-        X_test = np.array([clean_and_eval_list_string(pos) for pos in df_data_test['Effector position'].tolist()])
-        y_test = np.array([clean_and_eval_list_string(angle) for angle in df_data_test['Motor angle'].tolist()])
-
-
-        self.regr = MLPRegressor(random_state=1,hidden_layer_sizes=(128,128,),activation = "logistic", max_iter=20000)
-        self.regr.fit(X_train, y_train)
+        # Pytorch MLP
+        self.regr = PytorchMLPReg(input_size=3, model_file='./data/results/model_cube.pth')
+        if not self.regr.model_file:
+            x_train, y_train, x_test, y_test = self.regr.loadDataset('./data/results/blueleg_beam_sphere.csv')
+            self.regr.train(x_train, y_train)
 
     def onAnimateBeginEvent(self, _):
         """
@@ -83,6 +79,25 @@ class TargetController(Sofa.Core.Controller):
         if self.assembly.done:
             self.animationStep -= 1
             if self.targetIndex >= 0 and self.animationStep == 0:
+                # Store effector position in Trajectory MechanicalObject
+                position = list(np.copy(self.emio.getRoot().Modelling.Trajectory.getMechanicalState().position.value))
+                position[self.index] = self.emio.effector.getMechanicalState().position.value[0][0:3]
+                self.index += 1
+                self.emio.getRoot().Modelling.Trajectory.getMechanicalState().position.value = position
+                self.emio.getRoot().Modelling.Trajectory.getMechanicalState().reinit()
+
+                # calculate the error
+                delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.targetsPosition[self.targetIndex])
+                self.error.value = np.linalg.norm(delta)
+                self.errorX.value = delta[0]
+                self.errorY.value = delta[1]
+                self.errorZ.value = delta[2]
+
+                # calculate the r2 score using AI_models.r2_score_numpy
+                targets = np.array(self.targetsPosition[self.targetIndex:])
+                self.r2 = r2_score_numpy(targets, position[:len(self.targetsPosition)-self.targetIndex])
+
+                # Change target
                 self.targetIndex -= 1
                 self.animationStep = self.animationSteps
                 motors_angles= self.predict(list(self.targetsPosition[self.targetIndex]))
@@ -90,8 +105,6 @@ class TargetController(Sofa.Core.Controller):
                 self.emio.Motor1.JointActuator.value= motors_angles[0][1]
                 self.emio.Motor2.JointActuator.value= motors_angles[0][2]
                 self.emio.Motor3.JointActuator.value= motors_angles[0][3]
-                                
-
 
 
     def predict(self, position):
@@ -149,7 +162,7 @@ def createScene(rootnode):
     # Add Emio to the scene
     emio = Emio(name="Emio",
                 legsName=["blueleg"],
-                legsModel=["tetra"],
+                legsModel=["beam"],
                 legsPositionOnMotor=["counterclockwisedown","clockwisedown","counterclockwisedown","clockwisedown"],
                 centerPartName="bluepart",
                 centerPartType="rigid",
@@ -163,9 +176,13 @@ def createScene(rootnode):
     emio.addObject(assembly)
 
     # Generation of the targets
-    spherePositions = Targets(ratio=0.1, center=[0, -130, 0], size=80).sphere()
+    spherePositions = Targets(ratio=0.05, center=[0, -130, 0], size=80).sphere()
     sphere = modelling.addChild("SphereTargets")
     sphere.addObject("MechanicalObject", position=spherePositions, showObject=True, showObjectScale=10, drawMode=0)
+
+    # Trajectory storage
+    trajectory = modelling.addChild("Trajectory")
+    trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(spherePositions))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
 
     # Effector
     emio.effector.addObject("MechanicalObject", template="Rigid3", position=[0, 0, 0, 0, 0, 0, 1])
@@ -185,12 +202,4 @@ def createScene(rootnode):
                                         assembly=assembly,
                                         steps=STEP))
     
-    # Add depth camera tracker (distributed with Emio) 
-    # rootnode.addObject(DotTracker(name="DotTracker",
-    #                               root=rootnode,
-    #                               configuration="extended",
-    #                               nb_tracker=1, # We only look for one marker
-    #                               show_video_feed=True,
-    #                               track_colors=True)) # We track the color of the marker (green by default)
-
     return rootnode

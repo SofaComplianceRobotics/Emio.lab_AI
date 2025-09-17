@@ -23,9 +23,10 @@ Also use the `highlight` container to display any information you want to highli
 :::
 
 <!--Add sections -->
-#include(assets/labs/lab_AI/sections/section1.md)
-#include(assets/labs/lab_AI/sections/section2.md)
-#include(assets/labs/lab_AI/sections/section3.md)
+#include(assets/labs/lab_AI/sections/1_dataset.md)
+#include(assets/labs/lab_AI/sections/2_from_scratch.md)
+#include(assets/labs/lab_AI/sections/3_scikit-learn.md)
+#include(assets/labs/lab_AI/sections/4_pytorch.md)
 
 
 
