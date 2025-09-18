@@ -68,8 +68,7 @@ Click here to see the solution :
 The foarward propagation refers to the computation of the output of the network based on the input.
 
 Let  _A_ our activation function and $\mathcal{L}$  our loss function. 
-
-We use the __logistic__ function as the activation and the mean square error in this lab.
+We use the __logistic__ function as the activation and the __mean squared error__ as loss in this lab.
 
 $A_i=\frac{1}{1-e^{-Z_i}}$
 
@@ -112,21 +111,23 @@ Click here to see the solution :
 
 
 ## Backpropagation
-Backpropagation is an algorithm used to train neural networks by adjusting weights. It calculates the error between the predicted output and the actual output (loss) and propagates it backward through the network. The partial derivatives (gradient) of the loss with respect to the weights are used to update the weights via gradient descent.
+Backpropagation is an algorithm used to train neural networks by adjusting weights. It calculates the error between the predicted output and the actual output (loss) and propagates it backward through the network's layers. This is because the input of layer _i_ is the output of layer _i-1_.
+
+The partial derivatives (gradient) of the loss with respect to the weights W and biais b are used to update them via gradient descent.
 
 Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
 
-$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial \mathcal{A_3}}{\partial Z_3}*\frac{\partial \mathcal{Z}3}{\partial W_3}$
+$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3}$
 
-$\frac{\partial \mathcal{L}}{\partial b_3} = $
+$\frac{\partial \mathcal{L}}{\partial b_3} = ...$
 
-$\frac{\partial \mathcal{L}}{\partial W_2} = $
+$\frac{\partial \mathcal{L}}{\partial W_2} = ...$
 
-$\frac{\partial \mathcal{L}}{\partial b_2} = $
+$\frac{\partial \mathcal{L}}{\partial b_2} = ...$
 
-$\frac{\partial \mathcal{L}}{\partial W_1} = $
+$\frac{\partial \mathcal{L}}{\partial W_1} = ...$
 
-$\frac{\partial \mathcal{L}}{\partial b_1} = $
+$\frac{\partial \mathcal{L}}{\partial b_1} = ...$
 
 
 When it is done complete the following code:
