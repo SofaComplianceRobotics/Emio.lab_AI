@@ -11,6 +11,19 @@ We will need the followings :
     from sklearn.metrics import r2_score, mean_squared_error
     from tqdm import tqdm
 ```
+## The Neuron
+A neuron is a function that takes inputs, applies weights and a bias, then passes the result through an activation function to produce an output.
+
+The mathematical representation of a neuron is as follows:
+$$Z = W.X + b$$
+$$A = \text{ReLU}(Z) = \max(0, Z)$$
+
+Where:
+- _X_ is the input vector (features)
+- _W_ is the weight vector (parameters)
+- _b_ is the bias (parameter)
+- _Z_ is the weighted sum (linear combination)
+- _A_ is the output after applying the activation function (ReLU in this case)
 
 ## Loss function and Scoring function
 Propose a cost function and a scoring function to quantify the quality of predictions. Compare these functions with those we will use.
@@ -48,10 +61,22 @@ Complete the following code:
 
     return parametres
  ```
-Click here to see the solution : 
+Click here to see the solution :
+
 #open-button("initialization.py")
 
 The foarward propagation refers to the computation of the output of the network based on the input.
+
+Let  _A_ our activation function and $\mathcal{L}$  our loss function. 
+
+We use the __logistic__ function as the activation and the mean square error in this lab.
+
+$A_i=\frac{1}{1-e^{-Z_i}}$
+
+$L=\frac{1}{m}\sum_{i=1}^{m}(y_i-\hat{y}_i)^2$
+
+Where _i_ is the index of the layer, _X_ the input, _W_ the weights, _b_ the bias, $\hat{y}$ the true output and `m` the number of samples.
+
 
 Complete the following code:
 ```python
@@ -89,14 +114,19 @@ Click here to see the solution :
 ## Backpropagation
 Backpropagation is an algorithm used to train neural networks by adjusting weights. It calculates the error between the predicted output and the actual output (loss) and propagates it backward through the network. The partial derivatives (gradient) of the loss with respect to the weights are used to update the weights via gradient descent.
 
-Use the forward propagation to find the back propagation by expressing the following expressions (Use the chain rule as in the first expression ):
+Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
 
-$$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial \mathcal{A_3}}{\partial Z_3}*\frac{\partial \mathcal{Z}3}{\partial W_3}$$
-$$\frac{\partial \mathcal{L}}{\partial b_3}$$
-$$\frac{\partial \mathcal{L}}{\partial W_2}$$
-$$\frac{\partial \mathcal{L}}{\partial b_2}$$
-$$\frac{\partial \mathcal{L}}{\partial W_1}$$
-$$\frac{\partial \mathcal{L}}{\partial b_1}$$
+$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial \mathcal{A_3}}{\partial Z_3}*\frac{\partial \mathcal{Z}3}{\partial W_3}$
+
+$\frac{\partial \mathcal{L}}{\partial b_3} = $
+
+$\frac{\partial \mathcal{L}}{\partial W_2} = $
+
+$\frac{\partial \mathcal{L}}{\partial b_2} = $
+
+$\frac{\partial \mathcal{L}}{\partial W_1} = $
+
+$\frac{\partial \mathcal{L}}{\partial b_1} = $
 
 
 When it is done complete the following code:
