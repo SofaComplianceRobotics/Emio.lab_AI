@@ -5,22 +5,16 @@
 <!-- Highlight the summary / overview of the lab -->
 ::: highlight
 ##### Overview
-Describe your lab in few sentences.
+In this lab you will learn:
+- to use a dataset to train a multilayer perceptron (MLP)
+- to code your own backpropagation algorithm
+- to code your own MLP using
+    - sickit learn
+    - PyTorch
+- the impact of the dataset on the performance of the model
+
 :::
 
-<!--Highlight warnings -->
-::: highlight
-#icon("warning") **Warning:**
-
-Use the `highlight` container to display warning messages. 
-:::
-
-<!--Highlight information -->
-::: highlight
-#icon("info") **Info:**
-
-Also use the `highlight` container to display any information you want to highlight. 
-:::
 
 <!--Add sections -->
 #include(assets/labs/lab_AI/sections/1_dataset.md)

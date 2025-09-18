@@ -139,13 +139,5 @@ def createScene(rootnode):
                                         effector=emio.effector.EffectorCoord, 
                                         assembly=assembly,
                                         steps=STEP))
-    
-    # Add depth camera tracker (distributed with Emio) 
-    # rootnode.addObject(DotTracker(name="DotTracker",
-    #                               root=rootnode,
-    #                               configuration="extended",
-    #                               nb_tracker=1, # We only look for one marker
-    #                               show_video_feed=True,
-    #                               track_colors=True)) # We track the color of the marker (green by default)
 
     return rootnode
