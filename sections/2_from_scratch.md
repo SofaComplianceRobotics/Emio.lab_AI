@@ -26,15 +26,17 @@ Where:
 - _A_ is the output after applying the activation function (ReLU in this case)
 
 ## Loss function and Scoring function
-Propose a cost function and a scoring function to quantify the quality of predictions. Compare these functions with those we will use.
+A cost function and a scoring function quantify the quality of predictions. 
 
-For the remainder of the lesson, we will use the following loss function: 
+Depending on your problem, you might want to use different functions. 
+
+For the remainder of the lesson, we will use the following loss function, the mean squared error (MSE) for regression: 
 $$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
 
-and for the scoring function :
+and for the scoring function, the coefficient of determination ($R^2$):
 $$R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}$$
 
-It is possible to directly use the solutions provided by Scikit-learn: mean_squared_error() and r2_score().
+It is possible to directly use the solutions provided by Scikit-learn: `mean_squared_error()` and `r2_score()`.
 
 ## Initialization of the parameters and Forward Propagation
 We are going to build an MLP with two hidden layers of 128 neurons each. What are the dimensions of the input and output?
@@ -117,7 +119,7 @@ The partial derivatives (gradient) of the loss with respect to the weights W and
 
 Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
 
-$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3}$
+$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} = ...$
 
 $\frac{\partial \mathcal{L}}{\partial b_3} = ...$
 
