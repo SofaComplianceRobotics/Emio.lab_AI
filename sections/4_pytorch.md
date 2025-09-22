@@ -80,8 +80,19 @@ You probably wonder how to compute the loss and what is the optimizer.
 ::: exercise
 **Exercise 6**
 
-Code the training loop to train your model.
+1. Code the training loop to train your model.
 It should train on 20000 epochs.
+
+2. Complete the `train` function in `modules/pytorch_MLP.py`
+
+3. Train it the model, using the `train_model.py`: 
+```bash
+python train_model.py <model_type> <dataset_path>
+```
+
+- model_type: `custom`, `scikit-learn`, `pytorch`
+- dataset_path: `PATH/TO/DATASET.csv`
+- the trained model save path is `data/results/model_MODELTYPE.ext`
 
 :::
 
@@ -90,7 +101,22 @@ It should train on 20000 epochs.
 ::: exercise
 **Exercise 7**
 
-Evaluate your model using the `r2_score` function and the test data (the remaing of the split).
+1. Implement the `score` in `modules/pytorch_MLP.py`.
+Use the r2_score_pytorch` function.
+
+2. Evaluate it by calling
+```bash
+python evaluate_model.py <model_type> <dataset_path> <model_path>
+```
+
+- model_type: `custom`, `scikit-learn`, `pytorch`
+- dataset_path: `PATH/TO/DATASET`
+    - pytorch expects `pth` files
+    - scikit-learn and custom expct `joblib` files
+- model_path: `PATH/TO/MODEL`
+    - pytorch expects `pth` files
+    - scikit-learn and custom expct `joblib` files
+- the trained model save path is `data/results/model_MODELTYPE.ext`
 
 :::
 
@@ -99,5 +125,10 @@ Evaluate your model using the `r2_score` function and the test data (the remaing
 
 Use your model in the SOFA scene
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py")
+If you want to use your own model: 
+#input("eval_pytorch_model_path", "Path to the model joblib file", "data/results/model_pytorch_cube.pth")
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "sphere", "0.1")
 :::
+
+::::

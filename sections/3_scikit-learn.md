@@ -50,9 +50,24 @@ In the code above, since our features the components of a 3D point, we have 3 fe
 ::: exercise
 **Exercise 2**
 
-Create an MLP with two hidden layers of _128_ nodes each and that will train on _20000_ epochs.
+1. Create an MLP with two hidden layers of _128_ nodes each and that will train on _20000_ epochs.
+
+2. Complete the `train_sklearn_model` function in `train_model.py`
+
+3. Train it, using the `train_model.py`: 
+```bash
+python train_model.py <model_type> <dataset_path>
+```
+
+- model_type: `custom`, `scikit-learn`, `pytorch`
+- dataset_path: `PATH/TO/DATASET.csv`
+- the trained model save path is `data/results/model_MODELTYPE.ext`
+    - pytorch will save a  `pth` file
+    - scikit-learn and custom will save `joblib` files
 
 :::
+
+
 
 
 #### Evaluate the model
@@ -81,14 +96,17 @@ It should be better now.
 ##### With the SOFA simulation
 Now that you have a theoretically good-enough model, lets use it in simulation!
 
-We will use it to replace the inverse solver.
+We will use it as an inverse kinematics solver.
 
 ::: exercise
 **Exercise 4**
 
-Use your model in the SOFA scene
+Use your model in the SOFA scene.
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py")
+If you want to use your own model: 
+#input("eval_sklearn_model_path", "Path to the model joblib file", "data/results/model_sklearn.joblib")
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "sphere", "0.1")
 :::
 
 ::::

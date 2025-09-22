@@ -1,0 +1,45 @@
+import sys
+import os
+
+def train_custom_model(dataset_path):
+    from modules.custom_MLP import CustomANN2Layers
+    mlp = CustomANN2Layers()
+    x_train, y_train, _, _ = mlp.loadDataset(dataset_path)
+    mlp.train(x_train, y_train)
+    mlp.save("data/results/model_custom.joblib")
+
+def train_pytorch_model(dataset_path):
+    from modules.pytorch_MLP import PytorchMLPReg
+    mlp = PytorchMLPReg()
+    x_train, y_train, x_test, y_test = mlp.loadDataset(dataset_path)
+    mlp.train(x_train, y_train, x_test, y_test)
+    mlp.save("data/results/model_pytorch.pth")
+
+def train_sklearn_model(dataset_path):
+    from modules.sklearn_MLP import SklearnMLPReg
+    mlp = SklearnMLPReg()
+    x_train, y_train, x_test, y_test = mlp.loadDataset(dataset_path)
+    mlp.train(x_train, y_train)
+    mlp.save("data/results/model_sklearn.joblib")
+
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python train_model.py <model_type> <dataset_path>")
+        sys.exit(1)
+    model_type = sys.argv[1].lower()
+    dataset_path = sys.argv[2]
+    if not os.path.exists(dataset_path):
+        print(f"Dataset file not found: {dataset_path}")
+        sys.exit(1)
+    if model_type == "custom":
+        train_custom_model(dataset_path)
+    elif model_type == "pytorch":
+        train_pytorch_model(dataset_path)
+    elif model_type == "scikit-learn":
+        train_sklearn_model(dataset_path)
+    else:
+        print(f"Unknown model type: {model_type}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

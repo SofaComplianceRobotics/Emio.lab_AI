@@ -6,8 +6,9 @@
 ::: highlight
 ##### Overview
 In this lab you will learn:
+
 - to use a dataset to train a multilayer perceptron (MLP)
-- to code your own backpropagation algorithm
+- to code your own 2-hidden layer MLP from scratch
 - to code your own MLP using
     - sickit learn
     - PyTorch

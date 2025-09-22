@@ -14,7 +14,7 @@ The datasets can then be used to train the model. In this lab, we will only use 
 You can generate your own dataset using this scene.
 This will generate a dataset into the _data/results_ folder.
 
-#runsofa-button("assets/labs/lab_AI/lab_AI.py")
+#runsofa-button("assets/labs/lab_AI/lab_AI_dataset_generation.py")
 
 <br>
 

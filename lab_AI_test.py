@@ -1,20 +1,62 @@
 from modules.targets import Targets
-from AI_models import PytorchMLPReg, r2_score_numpy
+from modules.AI_models_utils import *
+from modules.custom_MLP import CustomANN2Layers
+from modules.tensorflow_MLP import TensorFlowMLPReg
+from modules.sklearn_MLP import SklearnMLPReg
+from modules.pytorch_MLP import PytorchMLPReg
 import Sofa
 import Sofa.ImGui as MyGui
 import csv
 from math import pi
 
-from sklearn.neural_network import MLPRegressor
-from sklearn.model_selection import train_test_split
-import pandas as pd
 import numpy as np
-import ast
-import re
 import os
 
 resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
 STEP=25
+
+class MLPController(Sofa.Core.Controller):
+    """
+        A Controller that loads a trained MLP model to predict the motor angles for Emio
+    """
+
+    def __init__(self, emio, implementation, model_file):
+        Sofa.Core.Controller.__init__(self)
+        self.name="MLPController"
+        self.emio = emio
+
+        self.implementation = implementation
+        self.model_file = model_file
+
+        #### MLP loading ####
+        if self.implementation == "pytorch":
+            self.regr = PytorchMLPReg(model_file=self.model_file)
+        elif self.implementation == "scikit-learn":
+            self.regr = SklearnMLPReg(model_file=self.model_file)
+        elif self.implementation == "custom":
+            self.regr = CustomANN2Layers(input_dim=3, hidden_layers=[128, 128], output_dim=4, model_file=self.model_file)
+        else:
+            print(f"[MLPController] Implementation {self.implementation} not implemented yet.")
+        
+        #### GUI ####
+        self.emio.addData(name="target_X", type="float", value=0.0)
+        self.emio.addData(name="target_Y", type="float", value=-10.0)
+        self.emio.addData(name="target_Z", type="float", value=0.0)
+        group = "MLP Controller"
+        MyGui.MyRobotWindow.addSettingInGroup("TCP X", self.emio.target_X, -150.0, 150.0, group)
+        MyGui.MyRobotWindow.addSettingInGroup("TCP Y", self.emio.target_Y, -200.0, -50.0, group)
+        MyGui.MyRobotWindow.addSettingInGroup("TCP Z", self.emio.target_Z, -150.0, 150.0, group)
+
+        
+    def onAnimateBeginEvent(self, _):
+        # Predict the motors angles using the MLP
+        motors_angles= self.predict([self.emio.target_X.value, self.emio.target_Y.value, self.emio.target_Z.value])
+        for i in range(4):
+            self.emio.getChild(f'Motor{i}').JointActuator.value= motors_angles[0][i]
+        
+    def predict(self, X):
+        return self.regr.predict(list([X]))
+
 
 class TargetController(Sofa.Core.Controller):
     """
@@ -41,7 +83,6 @@ class TargetController(Sofa.Core.Controller):
         self.animationSteps = steps 
         self.animationStep = self.animationSteps
         self.index = 0
-        
 
         #### Plotting the error ####
         self.addData(name="error", type="float", value=0)
@@ -54,36 +95,22 @@ class TargetController(Sofa.Core.Controller):
         MyGui.PlottingWindow.addData("errorY", self.errorY)
         MyGui.PlottingWindow.addData("errorZ", self.errorZ)
         MyGui.PlottingWindow.addData("r2", self.r2)
-
-        #### MLP Training ####
-
-        # Scikit-learn MLP
-        # self.regr = MLPRegressor(random_state=1,hidden_layer_sizes=(128,128,),activation = "logistic",max_iter=20000)#for small datasets solver ="lbfgs"
-        # self.regr.fit(X_train, y_train)
-
-        # Pytorch MLP
-        self.regr = PytorchMLPReg(input_size=3, model_file='./data/results/model_cube.pth')
-        if not self.regr.model_file:
-            x_train, y_train, x_test, y_test = self.regr.loadDataset('./data/results/blueleg_beam_sphere.csv')
-            self.regr.train(x_train, y_train)
+        
 
     def onAnimateBeginEvent(self, _):
         """
             Change the target when it's time
         """
-        # delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.targetsPosition[self.targetIndex])
-        # if np.linalg.norm(delta) < 1:
-        #     self.firstTargetReached = True
 
         if self.assembly.done:
             self.animationStep -= 1
             if self.targetIndex >= 0 and self.animationStep == 0:
+
                 # Store effector position in Trajectory MechanicalObject
                 position = list(np.copy(self.emio.getRoot().Modelling.Trajectory.getMechanicalState().position.value))
                 position[self.index] = self.emio.effector.getMechanicalState().position.value[0][0:3]
                 self.index += 1
                 self.emio.getRoot().Modelling.Trajectory.getMechanicalState().position.value = position
-                self.emio.getRoot().Modelling.Trajectory.getMechanicalState().reinit()
 
                 # calculate the error
                 delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.targetsPosition[self.targetIndex])
@@ -96,18 +123,13 @@ class TargetController(Sofa.Core.Controller):
                 targets = np.array(self.targetsPosition[self.targetIndex:])
                 self.r2 = r2_score_numpy(targets, position[:len(self.targetsPosition)-self.targetIndex])
 
-                # Change target
+                # Change target and update the motors angles
                 self.targetIndex -= 1
                 self.animationStep = self.animationSteps
-                motors_angles= self.predict(list(self.targetsPosition[self.targetIndex]))
-                self.emio.Motor0.JointActuator.value= motors_angles[0][0]
-                self.emio.Motor1.JointActuator.value= motors_angles[0][1]
-                self.emio.Motor2.JointActuator.value= motors_angles[0][2]
-                self.emio.Motor3.JointActuator.value= motors_angles[0][3]
+                self.emio.target_X.value = self.targetsPosition[self.targetIndex][0]
+                self.emio.target_Y.value = self.targetsPosition[self.targetIndex][1]
+                self.emio.target_Z.value = self.targetsPosition[self.targetIndex][2]
 
-
-    def predict(self, position):
-        return self.regr.predict([position])
 
     def getFilename(self):
         legname = self.emio.legsName[0]
@@ -147,10 +169,33 @@ def createScene(rootnode):
     """
         Emio simulation
     """
+    import argparse
+    import sys
     from utils.header import addHeader, addSolvers
     from parts.controllers.assemblycontroller import AssemblyController
     from parts.controllers.trackercontroller import DotTracker
     from parts.emio import Emio
+
+    ## Parse args
+    parser = argparse.ArgumentParser(prog=sys.argv[0],
+                                     description='Simulate a leg.')
+    parser.add_argument(metavar='implementation', type=str, nargs='?', help="the AI implementation to use",
+                        choices=["custom", "scikit-learn", "pytorch"],
+                        default='pytorch', dest="implementation")
+    parser.add_argument(metavar='model_file', type=str, nargs='?', help="the path to the file containing the model",
+                        default=resultsDirectory +'model_cube.pth', dest="model_file")
+    parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
+                        choices=["cube", "sphere"], default='sphere', dest="shape")
+    parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",
+                        default=0.1, dest="ratio")
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        Sofa.msg_error(sys.argv[0], "Invalid arguments, get defaults instead.")
+        args = parser.parse_args([])
+
+    Sofa.msg_info(os.path.basename(__file__), f"Using implementation: {args.implementation}, model file: {args.model_file}, shape: {args.shape}, ratio: {args.ratio}")
 
     settings, modelling, simulation = addHeader(rootnode, inverse=False)
 
@@ -175,13 +220,13 @@ def createScene(rootnode):
     emio.addObject(assembly)
 
     # Generation of the targets
-    spherePositions = Targets(ratio=0.05, center=[0, -130, 0], size=80).sphere()
-    sphere = modelling.addChild("SphereTargets")
-    sphere.addObject("MechanicalObject", position=spherePositions, showObject=True, showObjectScale=10, drawMode=0)
+    targetsPositions = Targets(ratio=args.ratio, center=[0, -130, 0], size=80).sphere() if args.shape == "sphere" else Targets(ratio=args.ratio, center=[0, -130, 0], size=80).cube()
+    targets = modelling.addChild("SphereTargets")
+    targets.addObject("MechanicalObject", position=targetsPositions, showObject=True, showObjectScale=10, drawMode=0)
 
     # Trajectory storage
     trajectory = modelling.addChild("Trajectory")
-    trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(spherePositions))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
+    trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(targetsPositions))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
 
     # Effector
     emio.effector.addObject("MechanicalObject", template="Rigid3", position=[0, 0, 0, 0, 0, 0, 1])
@@ -192,12 +237,14 @@ def createScene(rootnode):
                     minDisplacement=-pi, maxDisplacement=pi,
                     index=0, value=0, valueType="displacement")
 
-    # Components for the connection to the real robot 
-    #emio.addConnectionComponents()
+    # MLP Controller
+    rootnode.addObject(MLPController(emio=emio,
+                                        implementation=args.implementation,
+                                        model_file=args.model_file))
 
     # We add a controller to go through the targets
     rootnode.addObject(TargetController(emio=emio,
-                                        target=sphere,
+                                        target=targets,
                                         assembly=assembly,
                                         steps=STEP))
     
