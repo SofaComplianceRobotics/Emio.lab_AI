@@ -13,7 +13,7 @@ For each approach, you will:
 - evaluate the MLP.
 
 ## Datasets
-The datasets used in this lab are in CSV files containing the motors angles and the corresponding end-effector positions of Emio. The datasets are located in the `data/results` folder and has been generated using the SOFA simulation of Emio `lab_AI.py`.
+The datasets used in this lab are in CSV files containing the motors angles and the corresponding end-effector positions of Emio. The datasets are located in the `data/results` folder and has been generated using the SOFA simulation of Emio `lab_AI_dataset_generation.py`.
 
 You can use the scene to generate your own dataset by modifying the distance ratio between the sample points and the shape of the workspace (cube or sphere). 
 
@@ -27,15 +27,48 @@ Each methods of building the MLP will be presented in a separate section:
 - using Scikit-learn: `sections/3_scikit-learn.md`
 - using PyTorch: `sections/4_pytorch.md`
 
+## Training
+To train your models, use the provided `train_model.py` script. This script allows you to select the desired approach (numpy, scikit-learn, or PyTorch) and specify the dataset to use.
+
+### Training Instructions
+
+1. Open a terminal and navigate to the lab directory.
+2. Run the training script with the appropriate arguments. For example:
+    ```bash
+    python train_model.py <model_type> <dataset_path>
+    ```
+    - `model_type`: Choose between `custom`, `scikit-learn`, or `pytorch`.
+    - `dataset_path`: Path to your dataset CSV file.
+    - The path to where the model is saved is `data/results/model_MODEL_TYPE.ext`
+        - pytorch will save a `pth` file
+        - scikit-learn and custom will save `joblib` files
+
+3. The script will preprocess the data, build the MLP, train it, and save the trained model to the specified location.
 
 
-## Evaluation of the model with SOFA
+## Evaluation of the model 
+
+### Without SOFA
+1. Open a terminal and navigate to the lab directory.
+2. Run the `evaluate_model.py` script with the appropriate rguments.
+
+```bash
+python evaluate_model.py <model_type> <dataset_path> <model_path>
+```
+
+- model_type: `custom`, `scikit-learn`, `pytorch`
+- dataset_path: `PATH/TO/DATASET`
+    - pytorch expects `pth` files
+    - scikit-learn and custom expct `joblib` files
+- model_path: `PATH/TO/MODEL`
+    - pytorch expects `pth` files
+    - scikit-learn and custom expect `joblib` files
+3. This script will return the r2 score of the model based on the dataset.
+
+
+### With SOFA
 Once you have trained your model, you can use it in the SOFA scene to control the robot. The scene `lab_AI_test.py` is already set up to use your trained model. You just need to specify the path to your model file in the scene.
 
-## TO DO
-- [ ] Create the python file to build the MLP from scratch using numpy: `lab_AI_from_scratch.py`
-- [ ] Create the python file to build the MLP using Scikit-learn: `lab_AI_sklearn.py`
-- [ ] Create the python file to build the MLP using PyTorch: `lab_AI_pytorch.py`
-- [ ] Rename theh scene files
-- [ ] Make the SOFA scene parametrizable to use any model file and any dataset file
-- [ ] Tidy up the hierarchy of the lab folder
+The effector will then move to the different tagerts sampled along the sphere or cube
+
+![](data/images/evaluation_sphere.png)

@@ -93,6 +93,8 @@ python train_model.py <model_type> <dataset_path>
 - model_type: `custom`, `scikit-learn`, `pytorch`
 - dataset_path: `PATH/TO/DATASET.csv`
 - the trained model save path is `data/results/model_MODELTYPE.ext`
+    - pytorch will save `pth` files
+    - scikit-learn and custom will save `joblib` files
 
 :::
 
@@ -115,8 +117,7 @@ python evaluate_model.py <model_type> <dataset_path> <model_path>
     - scikit-learn and custom expct `joblib` files
 - model_path: `PATH/TO/MODEL`
     - pytorch expects `pth` files
-    - scikit-learn and custom expct `joblib` files
-- the trained model save path is `data/results/model_MODELTYPE.ext`
+    - scikit-learn and custom expect `joblib` files
 
 :::
 
@@ -126,7 +127,7 @@ python evaluate_model.py <model_type> <dataset_path> <model_path>
 Use your model in the SOFA scene
 
 If you want to use your own model: 
-#input("eval_pytorch_model_path", "Path to the model joblib file", "data/results/model_pytorch_cube.pth")
+#input("eval_pytorch_model_path", "Path to the model pth file", "data/results/model_pytorch_cube.pth")
 
 #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "sphere", "0.1")
 :::
