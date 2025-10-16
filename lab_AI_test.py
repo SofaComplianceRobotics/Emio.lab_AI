@@ -183,7 +183,7 @@ def createScene(rootnode):
                         choices=["custom", "scikit-learn", "pytorch"],
                         default='pytorch', dest="implementation")
     parser.add_argument(metavar='model_file', type=str, nargs='?', help="the path to the file containing the model",
-                        default=resultsDirectory +'model_cube.pth', dest="model_file")
+                        default=resultsDirectory +'model_pytorch_cube.pth', dest="model_file")
     parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
                         choices=["cube", "sphere"], default='sphere', dest="shape")
     parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",

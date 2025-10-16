@@ -8,13 +8,20 @@ Since we want to train a model that recovers the motors angles based on a desire
 
 The datasets can then be used to train the model. In this lab, we will only use a simple 2-layer perceptron.
 
-::: exercise
+::::: exercise
 **Generation SOFA Scene:**
 
 You can generate your own dataset using this scene.
 This will generate a dataset into the _data/results_ folder.
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_dataset_generation.py")
+:::: select dataset_shape 
+::: option sphere
+::: option cube
+::::
+
+#input("dataset_ratio", "Ratio to sample (the higher the coarser)", "0.08")
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_dataset_generation.py", "dataset_shape", "dataset_ratio")
 
 <br>
 
@@ -38,6 +45,6 @@ Effector position;Motor angle
 [-3.99504339e+01 -9.04556845e+01 -8.41130293e-05];[1.3485569542409783, 0.1566254899703859, 1.3478513803217718, -2.4934454150763674]
 ```
 
-:::
+:::::
 
 ::::::

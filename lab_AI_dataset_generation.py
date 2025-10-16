@@ -5,8 +5,10 @@ import csv
 import numpy as np
 import os
 
+import modules.polhemusUSB
+
 resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
-STEP=10
+STEP=30  # Number of steps to wait before changing target
 
 class TargetController(Sofa.Core.Controller):
     """
@@ -19,7 +21,7 @@ class TargetController(Sofa.Core.Controller):
         steps: number of simulation steps to wait before going to the next target  
     """
 
-    def __init__(self, emio, target, effector, assembly, steps=20):
+    def __init__(self, emio, target, effector, assembly, shape, steps=20):
         Sofa.Core.Controller.__init__(self)
         self.name="TargetController"
 
@@ -29,33 +31,41 @@ class TargetController(Sofa.Core.Controller):
 
         self.effector = effector
         self.assembly = assembly
-        self.firstTargetReached = False
+        self.targetReached = False
+
+        self.shape = shape
 
         self.animationSteps = steps 
         self.animationStep = self.animationSteps
         self.createCSVFile()
 
+        self.polhemus = modules.polhemusUSB.PolhemusUSB()
+
     def onAnimateBeginEvent(self, _):
         """
             Change the target when it's time
         """
-        delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.targetsPosition[self.targetIndex])
-        if np.linalg.norm(delta) < 1:
-            self.firstTargetReached = True
+        delta = np.array(self.polhemus.sensors[0].GetLastPosition()) - np.array(self.targetsPosition[self.targetIndex])
+        # print("Delta to target ", self.targetIndex, np.array(self.polhemus.sensors[0].GetLastPosition()), np.array(self.targetsPosition[self.targetIndex]), np.linalg.norm(delta))
+        if np.linalg.norm(delta) < 0.5:
+            self.targetReached = True
 
-        if self.assembly.done and self.firstTargetReached:
+        if self.assembly.done:
+            self.polhemus.UpdateSensors()
             self.animationStep -= 1
-            if self.targetIndex >= 0 and self.animationStep == 0:
+            if self.targetIndex >= 0 and (self.animationStep <= 0 or self.targetReached):
+                # print("Writing data for target ", self.targetIndex, self.animationStep, self.polhemus.sensors[0].GetLastPosition(), np.array(self.targetsPosition[self.targetIndex]), np.linalg.norm(delta))
                 self.writeToCSVFile()
                 self.targetIndex -= 1
                 self.animationStep = self.animationSteps
                 self.effector.effectorGoal = [list(self.targetsPosition[self.targetIndex]) + [0, 0, 0, 1]]
+                self.targetReached = False
 
     def getFilename(self):
         legname = self.emio.legsName[0]
         legmodel = self.emio.legsModel[0]
         count_positions = len(self.emio.getRoot().Modelling.SphereTargets.getMechanicalState().position.value)
-        return resultsDirectory + legname + "_"+ legmodel + '_sphere'+str(count_positions)+'.csv'
+        return resultsDirectory + legname + "_"+ legmodel + '_'+self.shape+str(count_positions)+'.csv'
 
     def createCSVFile(self):
         """
@@ -71,7 +81,7 @@ class TargetController(Sofa.Core.Controller):
             csvwriter.writerow(["# legs position on motor ", self.emio.legsPositionOnMotor.value])
             csvwriter.writerow(["# connector ", self.emio.centerPartName.value])
             csvwriter.writerow(["# connector type ", self.emio.centerPartType.value])
-            csvwriter.writerow(["Effector position", "Motor angle"])
+            csvwriter.writerow(["Effector position", "Motor angle", "Real Position"])
 
     def writeToCSVFile(self):
         """
@@ -83,7 +93,9 @@ class TargetController(Sofa.Core.Controller):
                                 [self.emio.Motor0.JointActuator.angle.value,
                                 self.emio.Motor1.JointActuator.angle.value,
                                 self.emio.Motor2.JointActuator.angle.value,
-                                self.emio.Motor3.JointActuator.angle.value]]) 
+                                self.emio.Motor3.JointActuator.angle.value],
+                                self.polhemus.sensors[0].GetLastPosition()
+                                ]) 
 
 
 def createScene(rootnode):
@@ -94,6 +106,25 @@ def createScene(rootnode):
     from parts.controllers.assemblycontroller import AssemblyController
     from parts.controllers.trackercontroller import DotTracker
     from parts.emio import Emio
+    import argparse
+    import sys
+
+    ## Parse args
+    parser = argparse.ArgumentParser(prog=sys.argv[0],
+                                     description='Simulate a leg.')
+    parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
+                        choices=["cube", "sphere"], default='sphere', dest="shape")
+    parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",
+                        default=0.08, dest="ratio")
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        Sofa.msg_error(sys.argv[0], "Invalid arguments, get defaults instead.")
+        args = parser.parse_args([])
+
+    
+    Sofa.msg_info(os.path.basename(__file__), f"Using shape: {args.shape}, ratio: {args.ratio}")
 
     settings, modelling, simulation = addHeader(rootnode, inverse=True)
 
@@ -118,7 +149,7 @@ def createScene(rootnode):
     emio.addObject(assembly)
 
     # Generation of the targets
-    spherePositions = Targets(ratio=0.05, center=[0, -130, 0], size=80).sphere()
+    spherePositions = Targets(ratio=args.ratio, center=[0, -130, 0], size=80).__getattribute__(args.shape)()
     sphere = modelling.addChild("SphereTargets")
     sphere.addObject("MechanicalObject", position=spherePositions, showObject=True, showObjectScale=10, drawMode=0)
 
@@ -138,6 +169,7 @@ def createScene(rootnode):
                                         target=sphere, 
                                         effector=emio.effector.EffectorCoord, 
                                         assembly=assembly,
+                                        shape=args.shape,
                                         steps=STEP))
 
     return rootnode
