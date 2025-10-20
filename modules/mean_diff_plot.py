@@ -25,53 +25,6 @@ import matplotlib.pyplot as plt
 
 DEFAULT_CSV = Path(__file__).parents[1] / 'data' / 'blueleg_beam_real_sphere1018.csv'
 
-# Possible column name patterns for the end-effector and real positions
-EE_PATTERNS = [r'ee', r'end.?eff', r'end_effector', r'endEffector', r'Effector\sposition']
-REAL_PATTERNS = [r'real', r'groundtruth', r'gt', r'meas', r'measured', r'reReal\sPositionalpos']
-
-COORD_SUFFIXES = [r'x', r'y', r'z']
-
-
-def find_columns(df):
-    """Try to infer the 3D position columns for end-effector and real position.
-    Returns tuples (ee_cols, real_cols) where each is [xcol,ycol,zcol] or None.
-    """
-    cols = df.columns.tolist()
-    lower_cols = [c.lower() for c in cols]
-
-    def match_group(patterns):
-        for p in patterns:
-            # try full group like ee_x, ee_y, ee_z or ee.x
-            regex = re.compile(rf"{p}")
-            matches = [c for c in cols if regex.search(c.lower())]
-            if len(matches) >= 3:
-                # try to order by suffix x,y,z
-                ordered = [None, None, None]
-                for c in matches:
-                    s = c.lower()[-1]
-                    if s in 'xyz':
-                        idx = 'xyz'.index(s)
-                        ordered[idx] = c
-                if all(ordered):
-                    return ordered
-                # fallback: return first 3
-                return matches[:3]
-        return None
-
-    ee_cols = match_group(EE_PATTERNS)
-    real_cols = match_group(REAL_PATTERNS)
-
-    # If patterns didn't match, fallback heuristics: look for any 3 columns that look like pos
-    if ee_cols is None:
-        # look for groups like pos_x pos_y pos_z
-        pos_regex = re.compile(r'pos.*([xyz])$')
-        matches = [c for c in cols if pos_regex.search(c.lower())]
-        if len(matches) >= 3:
-            ee_cols = matches[:3]
-
-    return ee_cols, real_cols
-
-
 def compute_distances(df, ee_cols, real_cols):
     ee = np.array(df[ee_cols].to_list())
     real = np.array(df[real_cols].to_list())
@@ -132,7 +85,6 @@ def main(argv):
     plt.plot(distsX, label='X component', alpha=0.5)
     plt.plot(distsY, label='Y component', alpha=0.5)
     plt.plot(distsZ, label='Z component', alpha=0.5)
-    plt.plot(running_mean(dists, N=50), label='running mean (N=50)', linewidth=2)
     plt.xlabel('sample index')
     plt.ylabel('distance')
     plt.title('End-effector vs Real position distance')
