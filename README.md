@@ -15,7 +15,15 @@ For each approach, you will:
 ## Datasets
 The datasets used in this lab are in CSV files containing the motors angles and the corresponding end-effector positions of Emio. The datasets are located in the `data/results` folder and has been generated using the SOFA simulation of Emio `lab_AI_dataset_generation.py`.
 
-You can use the scene to generate your own dataset by modifying the distance ratio between the sample points and the shape of the workspace (cube or sphere). 
+You can use the scene to generate your own dataset by modifying the distance ratio between the sample points and the shape of the workspace (cube or sphere).
+
+### Datasets with real positions
+We generated a dataset, not by using the positions from the simulation, but by tracking the robot's TCP position with a Polhemus magnetic tracker.
+We generated both a cube and a sphere dataset in the `result` folder: `blueleg_beam_real_cube2197.csv` and  `blueleg_beam_real_cube2197.csv`.
+
+If you want to learn the physical robot model, you can use these datasets for the training.
+These datasets have an extra column `Real Position` with the recorded tracked position.
+To use them, you have to modify the code 
 
 ## Build your own MLP
 You will build a multilayer perceptron (MLP) with two hidden layers of 128 neurons each. The input layer will have 3 neurons (the x, y, z coordinates of the end-effector position) and the output layer will have 4 neurons (the 4 motors angles).
@@ -35,13 +43,14 @@ To train your models, use the provided `train_model.py` script. This script allo
 1. Open a terminal and navigate to the lab directory.
 2. Run the training script with the appropriate arguments. For example:
     ```bash
-    python train_model.py <model_type> <dataset_path>
+    python train_model.py <model_type> <dataset_path> <OPTIONAL: learn from rea data>
     ```
     - `model_type`: Choose between `custom`, `scikit-learn`, or `pytorch`.
     - `dataset_path`: Path to your dataset CSV file.
     - The path to where the model is saved is `data/results/model_MODEL_TYPE.ext`
         - pytorch will save a `pth` file
         - scikit-learn and custom will save `joblib` files
+    - `learn_from_real`: Optional boolean to look for `Real Position` column in the dataset. Default is `False`
 
 3. The script will preprocess the data, build the MLP, train it, and save the trained model to the specified location.
 

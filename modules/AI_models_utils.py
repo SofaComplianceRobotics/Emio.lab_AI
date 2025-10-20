@@ -26,8 +26,9 @@ class BaseModel(ABC):
     @abstractmethod
     def load(self, file_path):
         pass
-
-    def loadDataset(self, file_path) -> np.ndarray:
+    
+    @staticmethod
+    def loadDataset(file_path, get_real=False) -> np.ndarray:
         import pandas as pd
         from sklearn.model_selection import train_test_split
 
@@ -46,9 +47,13 @@ class BaseModel(ABC):
         # Separate features (X) and target (y) for both training and test sets
         X_train = np.array([clean_and_eval_list_string(pos) for pos in df_data_training['Effector position'].tolist()])
         y_train = np.array([clean_and_eval_list_string(angle) for angle in df_data_training['Motor angle'].tolist()])
+        if get_real:
+            X_train = np.array([clean_and_eval_list_string(pos) for pos in df_data_training['Real Position'].tolist()]) if 'Real Position' in df_data_training.columns else None
 
         X_test = np.array([clean_and_eval_list_string(pos) for pos in df_data_test['Effector position'].tolist()])
         y_test = np.array([clean_and_eval_list_string(angle) for angle in df_data_test['Motor angle'].tolist()])
+        if get_real:
+            X_test = np.array([clean_and_eval_list_string(pos) for pos in df_data_test['Real Position'].tolist()]) if 'Real Position' in df_data_test.columns else None
 
         return X_train, y_train, X_test, y_test
 

@@ -5,7 +5,7 @@ import csv
 import numpy as np
 import os
 
-import modules.polhemusUSB
+import polhemus.polhemusUSB
 
 resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
 STEP=30  # Number of steps to wait before changing target
@@ -39,7 +39,7 @@ class TargetController(Sofa.Core.Controller):
         self.animationStep = self.animationSteps
         self.createCSVFile()
 
-        self.polhemus = modules.polhemusUSB.PolhemusUSB()
+        self.polhemus = polhemus.polhemusUSB.PolhemusUSB()
 
     def onAnimateBeginEvent(self, _):
         """
