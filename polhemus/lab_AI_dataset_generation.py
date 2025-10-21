@@ -5,8 +5,10 @@ import csv
 import numpy as np
 import os
 
+import polhemus.polhemusUSB
+
 resultsDirectory = os.path.dirname(os.path.realpath(__file__))+"/data/results/"
-STEP=10  # Number of steps to wait before changing target
+STEP=30  # Number of steps to wait before changing target
 
 class TargetController(Sofa.Core.Controller):
     """
@@ -37,17 +39,22 @@ class TargetController(Sofa.Core.Controller):
         self.animationStep = self.animationSteps
         self.createCSVFile()
 
+        self.polhemus = polhemus.polhemusUSB.PolhemusUSB()
+
     def onAnimateBeginEvent(self, _):
         """
             Change the target when it's time
         """
-        delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.targetsPosition[self.targetIndex])
+        delta = np.array(self.polhemus.sensors[0].GetLastPosition()) - np.array(self.targetsPosition[self.targetIndex])
+        # print("Delta to target ", self.targetIndex, np.array(self.polhemus.sensors[0].GetLastPosition()), np.array(self.targetsPosition[self.targetIndex]), np.linalg.norm(delta))
         if np.linalg.norm(delta) < 0.5:
             self.targetReached = True
 
         if self.assembly.done:
+            self.polhemus.UpdateSensors()
             self.animationStep -= 1
             if self.targetIndex >= 0 and (self.animationStep <= 0 or self.targetReached):
+                # print("Writing data for target ", self.targetIndex, self.animationStep, self.polhemus.sensors[0].GetLastPosition(), np.array(self.targetsPosition[self.targetIndex]), np.linalg.norm(delta))
                 self.writeToCSVFile()
                 self.targetIndex -= 1
                 self.animationStep = self.animationSteps
@@ -74,7 +81,7 @@ class TargetController(Sofa.Core.Controller):
             csvwriter.writerow(["# legs position on motor ", self.emio.legsPositionOnMotor.value])
             csvwriter.writerow(["# connector ", self.emio.centerPartName.value])
             csvwriter.writerow(["# connector type ", self.emio.centerPartType.value])
-            csvwriter.writerow(["Effector position", "Motor angle"])
+            csvwriter.writerow(["Effector position", "Motor angle", "Real Position"])
 
     def writeToCSVFile(self):
         """
@@ -86,7 +93,8 @@ class TargetController(Sofa.Core.Controller):
                                 [self.emio.Motor0.JointActuator.angle.value,
                                 self.emio.Motor1.JointActuator.angle.value,
                                 self.emio.Motor2.JointActuator.angle.value,
-                                self.emio.Motor3.JointActuator.angle.value]
+                                self.emio.Motor3.JointActuator.angle.value],
+                                self.polhemus.sensors[0].GetLastPosition()
                                 ]) 
 
 
