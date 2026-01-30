@@ -17,6 +17,7 @@ This will generate a dataset into the _data/results_ folder.
 :::: select dataset_shape 
 ::: option sphere
 ::: option cube
+::: option direct
 ::::
 
 #input("dataset_ratio", "Ratio to sample (the higher the coarser)", "0.08")

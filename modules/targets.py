@@ -5,12 +5,14 @@ class Targets:
 
     size : float  
     ratio : float 
-    center : list[float] 
+    center : list[float]
+    direct : bool
 
     def __init__(self, 
                  size: float=100.0, 
                  ratio: float=0.1, 
-                 center: list[float]=[0, 0, 0]):
+                 center: list[float]=[0, 0, 0],
+                 direct: bool=False):
         """
             size: size of the shape
             ratio: for the discretization of the shape in points
@@ -22,7 +24,6 @@ class Targets:
 
 
     def sphere(self):
-
         radius = self.size / 2
         positions = []
         cubePositions = self.cube()
@@ -35,7 +36,6 @@ class Targets:
     
 
     def cube(self):
-
         side = self.size
         positions = []
         dx = self.size * self.ratio
@@ -54,4 +54,23 @@ class Targets:
                                       ])
 
         return positions
+    
+    def inclined_plane(self):
+        pass
+
+    def motor_targets(self):
+        from itertools import product
+
+        positions = []
+        minAngle = -pi/2
+        nbAngles = 5
+
+        targetAngles = [minAngle + i * pi/(nbAngles-1) for i in range(nbAngles) ]
+        positions = list(product(targetAngles, repeat=4))
         
+        return positions
+
+
+if __name__=="__main__":
+    t = Targets()
+    print(t.motor_targets())

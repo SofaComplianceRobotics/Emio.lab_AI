@@ -1,9 +1,6 @@
 from modules.targets import Targets
 from modules.AI_models_utils import *
-from modules.custom_MLP import CustomANN2Layers
-from modules.tensorflow_MLP import TensorFlowMLPReg
-from modules.sklearn_MLP import SklearnMLPReg
-from modules.pytorch_MLP import PytorchMLPReg
+# from modules.tensorflow_MLP import TensorFlowMLPReg
 import Sofa
 import Sofa.ImGui as MyGui
 import csv
@@ -30,10 +27,13 @@ class MLPController(Sofa.Core.Controller):
 
         #### MLP loading ####
         if self.implementation == "pytorch":
+            from modules.pytorch_MLP import PytorchMLPReg
             self.regr = PytorchMLPReg(model_file=self.model_file)
         elif self.implementation == "scikit-learn":
+            from modules.sklearn_MLP import SklearnMLPReg
             self.regr = SklearnMLPReg(model_file=self.model_file)
         elif self.implementation == "custom":
+            from modules.custom_MLP import CustomANN2Layers
             self.regr = CustomANN2Layers(input_dim=3, hidden_layers=[128, 128], output_dim=4, model_file=self.model_file)
         else:
             print(f"[MLPController] Implementation {self.implementation} not implemented yet.")
@@ -236,6 +236,9 @@ def createScene(rootnode):
         motor.addObject("JointConstraint", name="JointActuator", 
                     minDisplacement=-pi, maxDisplacement=pi,
                     index=0, value=0, valueType="displacement")
+        
+    # Components for the connection to the real robot 
+    emio.addConnectionComponents()
 
     # MLP Controller
     rootnode.addObject(MLPController(emio=emio,

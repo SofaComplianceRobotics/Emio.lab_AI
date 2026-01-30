@@ -16,6 +16,13 @@ In this lab you will learn:
 
 :::
 
+:::collapse Install the libraries
+We are going to need third-parties libraries for this lab.
+
+Click the button below to install them:
+#python-button("-m pip install --target 'assets/labs/lab_AI/mod ules/site-packages' -r 'assets/labs/lab_AI/requirements.txt'")
+
+:::
 
 <!--Add sections -->
 #include(assets/labs/lab_AI/sections/1_dataset.md)
