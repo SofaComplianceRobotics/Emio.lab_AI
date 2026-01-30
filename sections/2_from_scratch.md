@@ -265,7 +265,7 @@ Use your model in the SOFA scene
 Use your own model: 
 #input("eval_custom_model_path", "Path to the model joblib file", "data/results/model_custom.joblib")
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "sphere", "0.1")
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "plane", "0.1")
 :::
 
 ::::::

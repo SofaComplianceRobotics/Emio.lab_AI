@@ -129,7 +129,7 @@ Use your model in the SOFA scene
 If you want to use your own model: 
 #input("eval_pytorch_model_path", "Path to the model pth file", "data/results/model_pytorch_cube.pth")
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "sphere", "0.1")
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "plane", "0.1")
 :::
 
 ::::

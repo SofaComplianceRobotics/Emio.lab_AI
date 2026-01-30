@@ -1,4 +1,4 @@
-from math import sin, cos, pi
+from math import sin, cos, pi, radians, tan
 import numpy as np
 
 class Targets:
@@ -55,8 +55,33 @@ class Targets:
 
         return positions
     
-    def inclined_plane(self):
-        pass
+
+    def inclined_plane(self, angle):
+        side = self.size
+        positions = []
+        dx = self.size * self.ratio
+        steps = int(side / dx) + 1
+
+        theta = radians(angle)   # inclination angle
+        slope = tan(theta)
+
+        directionx = 1
+        directionz = 1
+
+        for x in range(steps):
+            directionz = -directionz
+            for z in range(steps):
+
+                px = directionx * (x * dx - side / 2. + self.center[0])
+                pz = directionz * (z * dx - side / 2. + self.center[2])
+
+                # Plane equation
+                py = slope * (px) + self.center[1]
+
+                positions.append([px, py, pz])
+
+        return positions
+        
 
     def motor_targets(self):
         from itertools import product

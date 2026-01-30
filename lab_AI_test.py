@@ -84,6 +84,10 @@ class TargetController(Sofa.Core.Controller):
         self.animationStep = self.animationSteps
         self.index = 0
 
+        self.emio.target_X.value = self.targetsPosition[self.targetIndex][0]
+        self.emio.target_Y.value = self.targetsPosition[self.targetIndex][1]
+        self.emio.target_Z.value = self.targetsPosition[self.targetIndex][2]
+
         #### Plotting the error ####
         self.addData(name="error", type="float", value=0)
         self.addData(name="errorX", type="float", value=0)
@@ -185,7 +189,7 @@ def createScene(rootnode):
     parser.add_argument(metavar='model_file', type=str, nargs='?', help="the path to the file containing the model",
                         default=resultsDirectory +'model_pytorch_cube.pth', dest="model_file")
     parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
-                        choices=["cube", "sphere"], default='sphere', dest="shape")
+                        choices=["cube", "sphere", "plane"], default='sphere', dest="shape")
     parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",
                         default=0.1, dest="ratio")
 
@@ -220,13 +224,13 @@ def createScene(rootnode):
     emio.addObject(assembly)
 
     # Generation of the targets
-    targetsPositions = Targets(ratio=args.ratio, center=[0, -130, 0], size=80).sphere() if args.shape == "sphere" else Targets(ratio=args.ratio, center=[0, -130, 0], size=80).cube()
-    targets = modelling.addChild("SphereTargets")
-    targets.addObject("MechanicalObject", position=targetsPositions, showObject=True, showObjectScale=10, drawMode=0)
+    targets = Targets(ratio=args.ratio, center=[0, -130.0, 0], size=80.0).__getattribute__(args.shape)() if args.shape!='plane' else Targets(ratio=args.ratio, center=[0, -130.0, 0], size=80.0).inclined_plane(45)
+    targetsNode = modelling.addChild("Targets")
+    targetsNode.addObject("MechanicalObject", position=targets, showObject=True, showObjectScale=10, drawMode=0)
 
     # Trajectory storage
     trajectory = modelling.addChild("Trajectory")
-    trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(targetsPositions))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
+    trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(targets))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
 
     # Effector
     emio.effector.addObject("MechanicalObject", template="Rigid3", position=[0, 0, 0, 0, 0, 0, 1])
@@ -258,7 +262,7 @@ def createScene(rootnode):
 
     # We add a controller to go through the targets
     rootnode.addObject(TargetController(emio=emio,
-                                        target=targets,
+                                        target=targetsNode,
                                         assembly=assembly,
                                         steps=STEP))
     
