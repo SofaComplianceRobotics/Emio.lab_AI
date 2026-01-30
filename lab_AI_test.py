@@ -237,8 +237,19 @@ def createScene(rootnode):
                     minDisplacement=-pi, maxDisplacement=pi,
                     index=0, value=0, valueType="displacement")
         
-    # Components for the connection to the real robot 
+    # Components for the connection to the real robot and the tracking components
     emio.addConnectionComponents()
+
+    tracker = DotTracker(name="DotTracker",
+                            root=rootnode,
+                            configuration="extended",
+                            nb_tracker=2,
+                            show_video_feed=False,
+                            track_colors=True,
+                            comp_point_cloud=False,
+                            scale=1)
+
+    rootnode.addObject(tracker)
 
     # MLP Controller
     rootnode.addObject(MLPController(emio=emio,
@@ -250,5 +261,6 @@ def createScene(rootnode):
                                         target=targets,
                                         assembly=assembly,
                                         steps=STEP))
+    
     
     return rootnode

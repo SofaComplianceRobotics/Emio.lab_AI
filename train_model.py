@@ -1,26 +1,27 @@
 import sys
 import os
+import pathlib
 
 def train_custom_model(dataset_path, from_real=False):
     from modules.custom_MLP import CustomANN2Layers
     mlp = CustomANN2Layers()
     x_train, y_train, _, _ = mlp.loadDataset(dataset_path, from_real)
     mlp.train(x_train, y_train)
-    mlp.save("data/results/model_custom.joblib")
+    mlp.save(pathlib.Path(__file__).parent.joinpath("data/results/model_custom.joblib"))
 
 def train_pytorch_model(dataset_path, from_real=False):
     from modules.pytorch_MLP import PytorchMLPReg
     mlp = PytorchMLPReg()
     x_train, y_train, x_test, y_test = mlp.loadDataset(dataset_path, from_real)
     mlp.train(x_train, y_train, x_test, y_test)
-    mlp.save("data/results/model_pytorch.pth")
+    mlp.save(pathlib.Path(__file__).parent.joinpath("data/results/model_pytorch.pth"))
 
 def train_sklearn_model(dataset_path, from_real=False):
     from modules.sklearn_MLP import SklearnMLPReg
     mlp = SklearnMLPReg()
     x_train, y_train, x_test, y_test = mlp.loadDataset(dataset_path, from_real)
     mlp.train(x_train, y_train)
-    mlp.save("data/results/model_sklearn.joblib")
+    mlp.save(pathlib.Path(__file__).parent.joinpath("data/results/model_sklearn.joblib"))
 
 def main():
     if len(sys.argv) > 4 or len(sys.argv) < 3:
