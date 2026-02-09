@@ -1,5 +1,4 @@
 matplotlib
-tqdm
 scikit-learn
-torch
-tensorflow
+pandas
+libusb1
