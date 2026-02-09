@@ -59,6 +59,10 @@ In the code above, since our features the components of a 3D point, we have 3 fe
 python train_model.py <model_type> <dataset_path>
 ```
 
+OR 
+
+#python-button("'assets/labs/lab_AI/train_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_direct625.csv'")
+
 - model_type: `custom`, `scikit-learn`, `pytorch`
 - dataset_path: `PATH/TO/DATASET.csv`
 - the trained model save path is `data/results/model_MODELTYPE.ext`
@@ -106,7 +110,8 @@ Use your model in the SOFA scene.
 If you want to use your own model: 
 #input("eval_sklearn_model_path", "Path to the model joblib file", "data/results/model_sklearn.joblib")
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1")
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.99")
+
 :::
 
 ::::
