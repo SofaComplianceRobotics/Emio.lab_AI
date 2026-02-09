@@ -24,11 +24,12 @@ Click the button below to install them:
 
 :::
 
-<!--Add sections -->
-#include(assets/labs/lab_AI/sections/1_dataset.md)
+<!--Add sections
 #include(assets/labs/lab_AI/sections/2_from_scratch.md)
+#include(assets/labs/lab_AI/sections/4_pytorch.md)-->
 #include(assets/labs/lab_AI/sections/3_scikit-learn.md)
-#include(assets/labs/lab_AI/sections/4_pytorch.md)
+#include(assets/labs/lab_AI/sections/1_dataset.md)
+
 
 
 
