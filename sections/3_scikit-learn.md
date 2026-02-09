@@ -110,7 +110,9 @@ Use your model in the SOFA scene.
 If you want to use your own model: 
 #input("eval_sklearn_model_path", "Path to the model joblib file", "data/results/model_sklearn.joblib")
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.99")
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.5")
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "notargets", "0.5")
 
 :::
 

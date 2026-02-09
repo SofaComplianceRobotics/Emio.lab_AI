@@ -84,9 +84,10 @@ class TargetController(Sofa.Core.Controller):
         self.animationStep = self.animationSteps
         self.index = 0
 
-        self.emio.target_X.value = self.targetsPosition[self.targetIndex][0]
-        self.emio.target_Y.value = self.targetsPosition[self.targetIndex][1]
-        self.emio.target_Z.value = self.targetsPosition[self.targetIndex][2]
+        if len(self.targetsPosition):
+            self.emio.target_X.value = self.targetsPosition[self.targetIndex][0]
+            self.emio.target_Y.value = self.targetsPosition[self.targetIndex][1]
+            self.emio.target_Z.value = self.targetsPosition[self.targetIndex][2]
 
         #### Plotting the error ####
         self.addData(name="error", type="float", value=0)
@@ -94,11 +95,13 @@ class TargetController(Sofa.Core.Controller):
         self.addData(name="errorY", type="float", value=0)
         self.addData(name="errorZ", type="float", value=0)
         self.addData(name="r2", type="float", value=0)
+        self.addData(name="cameraerror", type="float", value=0)
         MyGui.PlottingWindow.addData("error", self.error)
         MyGui.PlottingWindow.addData("errorX", self.errorX)
         MyGui.PlottingWindow.addData("errorY", self.errorY)
         MyGui.PlottingWindow.addData("errorZ", self.errorZ)
         MyGui.PlottingWindow.addData("r2", self.r2)
+        MyGui.PlottingWindow.addData("cameraerror", self.cameraerror)
         
 
     def onAnimateBeginEvent(self, _):
@@ -122,6 +125,9 @@ class TargetController(Sofa.Core.Controller):
                 self.errorX.value = delta[0]
                 self.errorY.value = delta[1]
                 self.errorZ.value = delta[2]
+                if self.emio.getRoot().DepthCamera:
+                    delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.emio.getRoot().DepthCamera.getMechanicalState().position.value[0][0:3]) # camera
+                    self.cameraerror.value = np.linalg.norm(delta)
 
                 # calculate the r2 score using AI_models.r2_score_numpy
                 targets = np.array(self.targetsPosition[self.targetIndex:])
@@ -201,7 +207,7 @@ def createScene(rootnode):
     parser.add_argument(metavar='model_file', type=str, nargs='?', help="the path to the file containing the model",
                         default=resultsDirectory +'model_pytorch_cube.pth', dest="model_file")
     parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
-                        choices=["cube", "sphere", "plane"], default='sphere', dest="shape")
+                        choices=["cube", "sphere", "plane", "notargets"], default='sphere', dest="shape")
     parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",
                         default=0.1, dest="ratio")
 
@@ -259,7 +265,7 @@ def createScene(rootnode):
     tracker = DotTracker(name="DotTracker",
                             root=rootnode,
                             configuration="extended",
-                            nb_tracker=2,
+                            nb_tracker=1,
                             show_video_feed=False,
                             track_colors=True,
                             comp_point_cloud=False,

@@ -81,6 +81,9 @@ class Targets:
                 positions.append([px, py, pz])
 
         return positions
+    
+    def notargets(self):
+        return []
         
 
     def motor_targets(self):
