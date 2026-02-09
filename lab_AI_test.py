@@ -133,6 +133,18 @@ class TargetController(Sofa.Core.Controller):
                 self.emio.target_X.value = self.targetsPosition[self.targetIndex][0]
                 self.emio.target_Y.value = self.targetsPosition[self.targetIndex][1]
                 self.emio.target_Z.value = self.targetsPosition[self.targetIndex][2]
+            else:
+                # calculate the error
+                delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array([self.emio.target_X.value, self.emio.target_Y.value, self.emio.target_Z.value])
+                self.error.value = np.linalg.norm(delta)
+                self.errorX.value = delta[0]
+                self.errorY.value = delta[1]
+                self.errorZ.value = delta[2]
+
+                # calculate the r2 score using AI_models.r2_score_numpy
+                targets = np.array(self.targetsPosition[self.targetIndex:])
+                self.r2 = r2_score_numpy(np.array([[self.emio.target_X.value, self.emio.target_Y.value, self.emio.target_Z.value]]), np.array([self.emio.effector.getMechanicalState().position.value[0][0:3]]))
+
 
 
     def getFilename(self):
