@@ -125,9 +125,6 @@ class TargetController(Sofa.Core.Controller):
                 self.errorX.value = delta[0]
                 self.errorY.value = delta[1]
                 self.errorZ.value = delta[2]
-                if self.emio.getRoot().DepthCamera:
-                    delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.emio.getRoot().DepthCamera.getMechanicalState().position.value[0][0:3]) # camera
-                    self.cameraerror.value = np.linalg.norm(delta)
 
                 # calculate the r2 score using AI_models.r2_score_numpy
                 targets = np.array(self.targetsPosition[self.targetIndex:])
@@ -151,6 +148,10 @@ class TargetController(Sofa.Core.Controller):
                 targets = np.array(self.targetsPosition[self.targetIndex:])
                 self.r2 = r2_score_numpy(np.array([[self.emio.target_X.value, self.emio.target_Y.value, self.emio.target_Z.value]]), np.array([self.emio.effector.getMechanicalState().position.value[0][0:3]]))
 
+                # calculate the error between the tracker and the wanted TCP position
+                if self.emio.getRoot().DepthCamera:
+                        delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.emio.getRoot().DepthCamera.getMechanicalState().position.value[0][0:3]) # camera
+                        self.cameraerror.value = np.linalg.norm(delta)
 
 
     def getFilename(self):
@@ -205,11 +206,13 @@ def createScene(rootnode):
                         choices=["custom", "scikit-learn", "pytorch"],
                         default='pytorch', dest="implementation")
     parser.add_argument(metavar='model_file', type=str, nargs='?', help="the path to the file containing the model",
-                        default=resultsDirectory +'model_pytorch_cube.pth', dest="model_file")
+                        default=resultsDirectory +'model_sklearn.joblib', dest="model_file")
     parser.add_argument(metavar='shape', type=str, nargs='?', help="the shape of the trajectory to follow",
                         choices=["cube", "sphere", "plane", "notargets"], default='sphere', dest="shape")
     parser.add_argument(metavar='ratio', type=float, nargs='?', help="the division ratio of the target object's size",
                         default=0.1, dest="ratio")
+    parser.add_argument(metavar='dataset', type=str, nargs='?', help="the path to the dataset used for training and to display",
+                        default='', dest="dataset")
 
     try:
         args = parser.parse_args()
@@ -217,7 +220,7 @@ def createScene(rootnode):
         Sofa.msg_error(sys.argv[0], "Invalid arguments, get defaults instead.")
         args = parser.parse_args([])
 
-    Sofa.msg_info(os.path.basename(__file__), f"Using implementation: {args.implementation}, model file: {args.model_file}, shape: {args.shape}, ratio: {args.ratio}")
+    Sofa.msg_info(os.path.basename(__file__), f"Using implementation: {args.implementation}, model file: {args.model_file}, shape: {args.shape}, ratio: {args.ratio}, dataset: {args.dataset}")
 
     settings, modelling, simulation = addHeader(rootnode, inverse=False)
 
@@ -249,6 +252,19 @@ def createScene(rootnode):
     # Trajectory storage
     trajectory = modelling.addChild("Trajectory")
     trajectory.addObject("MechanicalObject", position=[[0, 0, 0] for i in range(len(targets))], showObject=True, showObjectScale=10, drawMode=0, showColor=[1,0,0,1])
+
+    # Dataset storage
+    if args.dataset:
+        if os.path.exists(args.dataset):
+            import pandas as pd
+            df_data_raw= pd.read_csv(args.dataset, delimiter=';', skiprows=8)
+            data_points = [clean_and_eval_list_string(pos) for pos in df_data_raw['Effector position'].tolist()]
+            rootnode.addData(name="drawDataset", type="float", value=1)
+            MyGui.MyRobotWindow.addSettingInGroup("Draw Dataset Points", rootnode.drawDataset, 0.0, 1.0, "")
+            dataset_points = modelling.addChild("Dataset")
+            dataset_points.addObject("MechanicalObject", position=data_points, showObject=rootnode.drawDataset.linkpath, showObjectScale=6, drawMode=0, showColor=[97/255,171/255,117/255,1])
+        else:
+            print("Dataset file could not be found ", args.dataset)
 
     # Effector
     emio.effector.addObject("MechanicalObject", template="Rigid3", position=[0, 0, 0, 0, 0, 0, 1])

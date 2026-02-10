@@ -1,4 +1,4 @@
-:::: collapse An MLP with sickit-learn
+:::: collapse A MLP with sickit-learn
 ### Train the Model and Test it
 
 #### Prepare the dataset
@@ -110,9 +110,17 @@ Use your model in the SOFA scene.
 If you want to use your own model: 
 #input("eval_sklearn_model_path", "Path to the model joblib file", "data/results/model_sklearn.joblib")
 
+Plane
+
 #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.5")
 
+No Targets
+
 #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "notargets", "0.5")
+
+Dataset
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1", "data/results/blueleg_beam_sphere.csv")
 
 :::
 
