@@ -213,6 +213,9 @@ def createScene(rootnode):
                         default=0.1, dest="ratio")
     parser.add_argument(metavar='dataset', type=str, nargs='?', help="the path to the dataset used for training and to display",
                         default='', dest="dataset")
+    parser.add_argument(metavar='legname', type=str, nargs='?', help="the path to the dataset used for training and to display",
+                        choices=["blueleg", "sleg"],
+                        default='blueleg', dest="legname")
 
     try:
         args = parser.parse_args()
@@ -220,7 +223,7 @@ def createScene(rootnode):
         Sofa.msg_error(sys.argv[0], "Invalid arguments, get defaults instead.")
         args = parser.parse_args([])
 
-    Sofa.msg_info(os.path.basename(__file__), f"Using implementation: {args.implementation}, model file: {args.model_file}, shape: {args.shape}, ratio: {args.ratio}, dataset: {args.dataset}")
+    Sofa.msg_info(os.path.basename(__file__), f"Using implementation: {args.implementation}, model file: {args.model_file}, shape: {args.shape}, ratio: {args.ratio}, dataset: {args.dataset}, leg name: {args.legname}")
 
     settings, modelling, simulation = addHeader(rootnode, inverse=False)
 
@@ -230,8 +233,8 @@ def createScene(rootnode):
 
     # Add Emio to the scene
     emio = Emio(name="Emio",
-                legsName=["blueleg"],
-                legsModel=["beam"],
+                legsName=[args.legname],
+                legsModel=["beam" if args.legname=="blueleg" else "tetra"],
                 legsPositionOnMotor=["counterclockwisedown","clockwisedown","counterclockwisedown","clockwisedown"],
                 centerPartName="bluepart",
                 centerPartType="rigid",
