@@ -24,7 +24,5 @@ Click the button below to install them:
 #include(assets/labs/modules/camera_calibration.md)
 #include(assets/labs/lab_AI/sections/3_scikit-learn.md)
 
-TODO: Change the dataset
-
 ## Appendix
 #include(assets/labs/lab_AI/sections/1_dataset.md)

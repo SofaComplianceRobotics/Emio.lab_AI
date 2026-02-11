@@ -14,12 +14,14 @@ The datasets can then be used to train the model. In this lab, we will only use 
 You can generate your own dataset using this scene.
 This will generate a dataset into the _data/results_ folder.
 
-:::: select dataset_shape 
+Select the point generation method:
+:::: select dataset_shape
 ::: option sphere
 ::: option cube
 ::: option direct
 ::::
 
+Ratio of the sampling ]0, 1[ (the higher the coarser): 
 #input("dataset_ratio", "Ratio to sample (the higher the coarser)", "0.08")
 
 #runsofa-button("assets/labs/lab_AI/lab_AI_dataset_generation.py", "dataset_shape", "dataset_ratio")

@@ -36,6 +36,8 @@ In the code above, since our features the components of a 3D point, we have 3 fe
 
     If the above button does not work run the following:
     ```bash
+    cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
+    cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
     python train_model.py scikit-learn data/results/blueleg_beam_sphere.csv
     ```
     
@@ -44,8 +46,6 @@ In the code above, since our features the components of a 3D point, we have 3 fe
 Note that we used the dataset called `blueleg_beam_sphere.csv`. This is because we generated it using the inverse model of Emio configured with the **blue legs**, the **beam** model, and data points sampled on a **sphere**. 
 
 :::
-
-
 
 
 #### Evaluate the model
@@ -61,21 +61,42 @@ mlp.score(X_test, y_test)
 ::: exercise
 **Exercise 2**
 
-Calculate the score of the model by pressing the button below:
+Let's see the perpformance of our model. Calculate the score of the model by pressing the button below:
 
 #python-button("'assets/labs/lab_AI/evaluate_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_cube.csv' 'assets/labs/lab_AI/data/results/model_sklearn.joblib'")
 
 If the above button does not work run the following:
 ```bash
+cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
+cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
 python evaluate_model.py scikit-learn data/results/blueleg_beam_cube.csv assets/labs/lab_AI/data/results/model_sklearn.joblib
 ```
-Note that we are testing the model onanother dataset: *blueleg_beam_cube.csv*
 
-You should have a score that is quite low.
+*Note*: we are testing the model on another dataset: *blueleg_beam_cube.csv*
 
-This is mostly due to the fact the MLP is using relu as an activation function. However, if you look at the dataset, you have lots of negative values because of the where the reference frame of Emio is.
+You should have a score that is quite low. This is mostly due to the fact the MLP is using relu as an activation function. However, if you look at the dataset, you have lots of negative values because of the where the reference frame of Emio is.
 
-To avoid this problem, use the `logistic` activation function in `modules/sklearn_MLP.py`. and calculate the score again.
+To avoid this problem, use the `logistic` activation function in `modules/sklearn_MLP.py`, train and calculate the score again:
+
+2. Train again
+    #python-button("'assets/labs/lab_AI/train_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_sphere.csv'")
+
+    If the above button does not work run the following:
+    ```bash
+    cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
+    cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
+    python train_model.py scikit-learn data/results/blueleg_beam_sphere.csv
+
+    ```
+3. Calculate the r2 score again
+    #python-button("'assets/labs/lab_AI/evaluate_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_cube.csv' 'assets/labs/lab_AI/data/results/model_sklearn.joblib'")
+
+    If the above button does not work run the following:
+    ```bash
+    cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
+    cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
+    python evaluate_model.py scikit-learn data/results/blueleg_beam_cube.csv assets/labs/lab_AI/data/results/model_sklearn.joblib
+    ```
 
 :::
 
@@ -99,10 +120,37 @@ No Targets
 
 #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1")
 
-Show Dataset
+Show Dataset (in green)
 
 #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1", "data/results/blueleg_beam_sphere.csv")
 
+:::
+
+#### Changing the dataset
+For this lab, we generated three types of datasets, one by sampling points on a sphere, on a cube and a last one using the direct simulation and moving the four motors to 7 angles.
+
+Until now, we trained the model using a dataset made of points sampled on a sphere.
+Let's see how the dataset can influence the performance of our model.
+
+::: exercise
+**Exercise 4**
+
+1. Open a terminal:
+    #python-button("-c ''")
+
+2. Enter the following commands:
+
+    ```bash
+    cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
+    cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
+    python train_model.py scikit-learn data/results/blueleg_beam_direct2401.csv
+    ```
+
+The trained model save path is `data/results/model_sklearn.joblib`
+
+Open the simulation and observe the result:
+
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1", "data/results/blueleg_beam_direct625.csv")
 :::
 
 ::::

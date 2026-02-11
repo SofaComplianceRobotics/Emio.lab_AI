@@ -149,7 +149,7 @@ class TargetController(Sofa.Core.Controller):
                 self.r2 = r2_score_numpy(np.array([[self.emio.target_X.value, self.emio.target_Y.value, self.emio.target_Z.value]]), np.array([self.emio.effector.getMechanicalState().position.value[0][0:3]]))
 
                 # calculate the error between the tracker and the wanted TCP position
-                if self.emio.getRoot().DepthCamera:
+                if self.emio.getRoot().MotorController.emiomotors.is_connected:
                         delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.emio.getRoot().DepthCamera.getMechanicalState().position.value[0][0:3]) # camera
                         self.cameraerror.value = np.linalg.norm(delta)
 
@@ -234,7 +234,7 @@ def createScene(rootnode):
     # Add Emio to the scene
     emio = Emio(name="Emio",
                 legsName=[args.legname],
-                legsModel=["beam" if args.legname=="blueleg" else "tetra"],
+                legsModel=["beam"],
                 legsPositionOnMotor=["counterclockwisedown","clockwisedown","counterclockwisedown","clockwisedown"],
                 centerPartName="bluepart",
                 centerPartType="rigid",
