@@ -1,5 +1,4 @@
-:::::: collapse Dataset
-### Dataset Generation
+:::::: collapse Dataset Generation
 
 We can use the simulation to generate the dataset.
 Since we want to train a model that recovers the motors angles based on a desired 3D position of the end effector, the dataset will need these data:

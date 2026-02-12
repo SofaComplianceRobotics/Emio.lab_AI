@@ -30,6 +30,7 @@ In the code above, since our features the components of a 3D point, we have 3 fe
 **Exercise 1**
 
 1. Create an MLP with two hidden layers of _128_ nodes each and that will train on _20000_ epochs in the `modules/sklearn_MLP.py`
+    #open-button("assets/labs/lab_AI/modules/sklearn_MLP.py")
 
 2. Train it: 
     #python-button("'assets/labs/lab_AI/train_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_sphere.csv'")
@@ -43,10 +44,9 @@ In the code above, since our features the components of a 3D point, we have 3 fe
     
     The trained model save path is `data/results/model_sklearn.joblib`
 
-Note that we used the dataset called `blueleg_beam_sphere.csv`. This is because we generated it using the inverse model of Emio configured with the **blue legs**, the **beam** model, and data points sampled on a **sphere**. 
+Note that we used the dataset called `blueleg_beam_sphere.csv`. This is because we generated it using **an inverse model** (to be presented next time) of Emio configured with the **blue legs**, the **beam** model, and data points sampled on a **sphere**. 
 
 :::
-
 
 #### Evaluate the model
 
@@ -56,7 +56,6 @@ You can use the [MLPRegressor.score](https://scikit-learn.org/stable/modules/gen
 ```python
 mlp.score(X_test, y_test)
 ```
-
 
 ::: exercise
 **Exercise 2**
@@ -76,7 +75,8 @@ python evaluate_model.py scikit-learn data/results/blueleg_beam_cube.csv assets/
 
 You should have a score that is quite low. This is mostly due to the fact the MLP is using relu as an activation function. However, if you look at the dataset, you have lots of negative values because of the where the reference frame of Emio is.
 
-To avoid this problem, use the `logistic` activation function in `modules/sklearn_MLP.py`, train and calculate the score again:
+1. To avoid this problem, use the `logistic` activation function in `modules/sklearn_MLP.py`, train and calculate the score again:
+#open-button("assets/labs/lab_AI/modules/sklearn_MLP.py")
 
 2. Train again
     #python-button("'assets/labs/lab_AI/train_model.py' scikit-learn 'assets/labs/lab_AI/data/results/blueleg_beam_sphere.csv'")
@@ -104,53 +104,57 @@ To avoid this problem, use the `logistic` activation function in `modules/sklear
 ##### With the SOFA simulation
 Now that you have a theoretically good-enough model, lets use it in simulation!
 
-We will use it as an inverse kinematics solver.
+The trained model will be used to compute the robot’s inverse kinematics; that is, for a desired position in space, the MLP will provide the corresponding motor positions. This is the foundation of control and motion planning in robotics.
 
 ::: exercise
 **Exercise 3**
 
 Use your model in the SOFA scene.
 
-If you want to use your own model: 
-#input("eval_sklearn_model_path", "Path to the model joblib file", "data/results/model_sklearn.joblib")
+---
 
-No Targets
+***First test: Manual Position Control of the Robot***
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "notargets", "0.5")
+Using the sliders on the right-hand side of the interface, you can control the robot’s x, y, and z positions.  
+This allows you to manually test different robot configurations, and for each one, measure the error between:  
+- the desired position,  
+- the simulated model position (which we'll discuss next time), and  
+- the position measured by the camera.
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1")
+| ![](assets/labs/lab_AI/data/images/Pos3_EmioTest.png){width=90%} | ![](assets/labs/lab_AI/data/images/Pos1_EmioTest.png){width=90%} | ![](assets/labs/lab_AI/data/images/Pos2_EmioTest.png){width=90%} |
+|:--:|:--:|:--:|
 
-Show Dataset (in green)
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1", "data/results/blueleg_beam_sphere.csv")
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "data/results/model_sklearn.joblib", "notargets", "0.4")
 
-:::
+--- 
+> **Questions**  
+> Is the error between the desired position and the simulated position (used for training) always the same depending on the robot’s position?  
+> How does it vary with respect to the camera position?  
+> At this stage, can you provide a first analysis of the errors?
+---
 
-#### Changing the dataset
-For this lab, we generated three types of datasets, one by sampling points on a sphere, on a cube and a last one using the direct simulation and moving the four motors to 7 angles.
+***Second Test: More systematic*** 
+Here, we propose to perform a systematic scan of positions in the form of a grid of points evenly spaced on a plane.
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "data/results/model_sklearn.joblib", "plane", "ratio_sklearn")
 
-Until now, we trained the model using a dataset made of points sampled on a sphere.
-Let's see how the dataset can influence the performance of our model.
+By default, the spacing is set to `0.1`, meaning the spacing is given by the plane size is divided by 10.
+To change this spacing, you can enter a number in ]0, 1[: 
+#input("ratio_sklearn", "Ratio for sampling", "0.1")
+--- 
+> **Questions**  
+> How the errors occur? What conclusions can be drawn from this?
+> Now it’s your turn ! What strategy can you apply to improve the learning ? (not mandatory, but see some possibilities in the next sections)
 
-::: exercise
-**Exercise 4**
+---
 
-1. Open a terminal:
-    #python-button("-c ''")
+>**Additional note:**
+> This is similar to the previous simulation, but here you can visualize the entire set of points used for training.
 
-2. Enter the following commands:
+#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "data/results/model_sklearn.joblib", "plane", "ratio_sklearn", "data/results/blueleg_beam_sphere.csv")
 
-    ```bash
-    cd ~/emio-labs/v25.12.01/labs/lab_AI # Linux
-    cd "%USERPROFILE%\emio-labs\v25.12.01\assets\labs\lab_AI" # Windows
-    python train_model.py scikit-learn data/results/blueleg_beam_direct2401.csv
-    ```
+| ![](assets/labs/lab_AI/data/images/Workspace.png){width=90%} 
+|:--:|
 
-The trained model save path is `data/results/model_sklearn.joblib`
-
-Open the simulation and observe the result:
-
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval_sklearn_model_path", "plane", "0.1", "data/results/blueleg_beam_direct625.csv")
-:::
-
+*** ***
 ::::
