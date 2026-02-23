@@ -95,13 +95,13 @@ class TargetController(Sofa.Core.Controller):
         self.addData(name="errorY", type="float", value=0)
         self.addData(name="errorZ", type="float", value=0)
         self.addData(name="r2", type="float", value=0)
-        self.addData(name="cameraerror", type="float", value=0)
+        self.addData(name="camera_to_target_error", type="float", value=0)
         MyGui.PlottingWindow.addData("error", self.error)
         MyGui.PlottingWindow.addData("errorX", self.errorX)
         MyGui.PlottingWindow.addData("errorY", self.errorY)
         MyGui.PlottingWindow.addData("errorZ", self.errorZ)
         MyGui.PlottingWindow.addData("r2", self.r2)
-        MyGui.PlottingWindow.addData("cameraerror", self.cameraerror)
+        MyGui.PlottingWindow.addData("camera_to_target_error", self.camera_to_target_error)
         
 
     def onAnimateBeginEvent(self, _):
@@ -151,7 +151,7 @@ class TargetController(Sofa.Core.Controller):
                 # calculate the error between the tracker and the wanted TCP position
                 if self.emio.getRoot().MotorController.emiomotors.is_connected:
                         delta = np.array(self.emio.effector.getMechanicalState().position.value[0][0:3]) - np.array(self.emio.getRoot().DepthCamera.getMechanicalState().position.value[0][0:3]) # camera
-                        self.cameraerror.value = np.linalg.norm(delta)
+                        self.camera_to_target_error.value = np.linalg.norm(delta)
 
 
     def getFilename(self):
