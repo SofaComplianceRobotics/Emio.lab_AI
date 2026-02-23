@@ -6,7 +6,7 @@ Until now, we trained the model using a dataset made of points sampled on a sphe
 ::: exercise
 **Exercise**
 
-In the folder `data/results` you can test several other dataset and retrain your MLP
+In the folder `home/emio-labs/<VERSION>/assets/labs/lab_AI/data/results` you can find several other dataset and retrain your MLP
 
 1. Select your csv (or see following section to create your own data set). Here we will select a dataset obtained by systematicallty moving each motor to seven positions (7x7x7x7 configurations): 
 2. Open a terminal:
