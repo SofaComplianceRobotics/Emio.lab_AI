@@ -81,6 +81,9 @@ class Targets:
                 positions.append([px, py, pz])
 
         return positions
+    
+    def notargets(self):
+        return []
         
 
     def motor_targets(self):
@@ -88,7 +91,7 @@ class Targets:
 
         positions = []
         minAngle = -pi/2
-        nbAngles = 5
+        nbAngles = 7
 
         targetAngles = [minAngle + i * pi/(nbAngles-1) for i in range(nbAngles) ]
         positions = list(product(targetAngles, repeat=4))

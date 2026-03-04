@@ -16,22 +16,36 @@ def train_pytorch_model(dataset_path, from_real=False):
     mlp.train(x_train, y_train, x_test, y_test)
     mlp.save(pathlib.Path(__file__).parent.joinpath("data/results/model_pytorch.pth"))
 
-def train_sklearn_model(dataset_path, from_real=False):
+def train_sklearn_model(dataset_path, output_file, from_real=False):
     from modules.sklearn_MLP import SklearnMLPReg
+    if output_file is None:
+        output_file = "data/results/model_sklearn.joblib"
     mlp = SklearnMLPReg()
     x_train, y_train, x_test, y_test = mlp.loadDataset(dataset_path, from_real)
     mlp.train(x_train, y_train)
-    mlp.save(pathlib.Path(__file__).parent.joinpath("data/results/model_sklearn.joblib"))
+    mlp.save(pathlib.Path(__file__).parent.joinpath(output_file))
 
 def main():
-    if len(sys.argv) > 4 or len(sys.argv) < 3:
-        print("Usage: python train_model.py <model_type> <dataset_path>")
-        sys.exit(1)
-    model_type = sys.argv[1].lower()
-    dataset_path = sys.argv[2]
+    import argparse, sys
+    parser=argparse.ArgumentParser()
+    parser.add_argument("model_type", type=str, choices=["custom", "scikit-learn", "pytorch"], help="The type of model that is trained")
+    parser.add_argument("dataset_path", type=str, help="The path to the dataset starting from the lab folder")
+    parser.add_argument("--from-real", help="Uset the real effector position from the dataset instead of the one from the simulation", dest="from_real")
+    parser.add_argument("--output", help="Name of the trained model file to save to")
+
+    try:
+        args = parser.parse_args()
+    finally:
+        print(f"Arguments: model_type: {args.model_type}, dataset: {args.dataset_path}, learn from real position: {args.from_real}, output file: {args.output}")
+
+
+    model_type = args.model_type.lower()
+    dataset_path = args.dataset_path
     learn_from_real = False
+
+
     if len(sys.argv) == 4:
-        learn_from_real = sys.argv[3].lower() == "from-real"
+        learn_from_real = args.from_real is not None
     if not os.path.exists(dataset_path):
         print(f"Dataset file not found: {dataset_path}")
         sys.exit(1)
@@ -41,7 +55,7 @@ def main():
     elif model_type == "pytorch":
         train_pytorch_model(dataset_path, learn_from_real)
     elif model_type == "scikit-learn":
-        train_sklearn_model(dataset_path, learn_from_real)
+        train_sklearn_model(dataset_path, args.output, learn_from_real)
     else:
         print(f"Unknown model type: {model_type}")
         sys.exit(1)
