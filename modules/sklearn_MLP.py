@@ -7,8 +7,8 @@ class SklearnMLPReg(BaseModel):
         from sklearn.neural_network import MLPRegressor
 
         self.batch_size = batch_size
-        self.model = MLPRegressor(hidden_layer_sizes=(100,), solver='adam',                     # Line to change
-                                  max_iter=500, batch_size=self.batch_size, random_state=1)     # Line to change
+        self.model = MLPRegressor(hidden_layer_sizes=(128, 128), activation='logistic', solver='adam',  # Line to change
+                                  max_iter=20000, batch_size=self.batch_size, random_state=1)           # Line to change
         if model_file:
             self.load(model_file)
         
