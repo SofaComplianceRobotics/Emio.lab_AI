@@ -34,7 +34,7 @@ class BaseModel(ABC):
 
         print(f"[BaseModel] Loading dataset from {file_path}")
 
-        # Loading  du dataset
+        # Loading dataset
         df_data_raw= pd.read_csv(file_path, delimiter=';', skiprows=8)
 
         # Shuffle the dataframe

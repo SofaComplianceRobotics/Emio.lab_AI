@@ -8,10 +8,7 @@
 In this lab you will learn:
 
 - to use a dataset to train a multilayer perceptron (MLP)
-- to code your own 2-hidden layer MLP from scratch
-- to code your own MLP using
-    - sickit learn
-    - PyTorch
+- to code your own MLP using sickit learn
 - the impact of the dataset on the performance of the model
 
 :::
@@ -24,13 +21,9 @@ Click the button below to install them:
 
 :::
 
-<!--Add sections -->
-#include(assets/labs/lab_AI/sections/1_dataset.md)
-#include(assets/labs/lab_AI/sections/2_from_scratch.md)
+#include(assets/labs/modules/camera_calibration.md)
 #include(assets/labs/lab_AI/sections/3_scikit-learn.md)
-#include(assets/labs/lab_AI/sections/4_pytorch.md)
 
-
-
-
-
+## Appendix
+#include(assets/labs/lab_AI/sections/change_dataset.md)
+#include(assets/labs/lab_AI/sections/1_dataset.md)
