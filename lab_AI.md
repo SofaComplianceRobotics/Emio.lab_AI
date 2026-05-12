@@ -17,7 +17,12 @@ In this lab you will learn:
 We are going to need third-parties libraries for this lab.
 
 Click the button below to install them:
-#python-button("-m pip install --target 'assets/labs/lab_AI/modules/site-packages' -r 'assets/labs/lab_AI/requirements.txt'")
+#python-button(pyargs=["-m pip install --target", "assets/labs/lab_AI/modules/site-packages", "-r", "assets/labs/lab_AI/requirements.txt"])
+
+This will install the following libraries:
+```
+#include(assets/labs/lab_AI/requirements.txt)
+```
 
 :::
 
