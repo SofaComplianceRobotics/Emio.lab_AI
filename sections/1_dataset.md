@@ -55,7 +55,7 @@ Select the point generation method:
 ::: option direct
 ::::
 
-Ratio of the sampling ]0, 1[ (the higher the coarser) for `sphere` and `cube` options: 
+Ratio of the sampling $]0, 1[$ (the higher the coarser) for `sphere` and `cube` options: 
 #input("dataset_ratio", "Ratio to sample (the higher the coarser)", "0.08")
 
 #runsofa-button(file="assets/labs/lab_AI/lab_AI_dataset_generation.py", pyargs=["dataset_shape", "dataset_ratio"])
