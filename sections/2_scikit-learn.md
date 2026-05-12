@@ -19,7 +19,7 @@ A summary of this is in the diagram below:
 
 ### Train the Model and Test it
 
-In this part, we will use scikit-learn to train a MLP because it only needs a call to two functions.
+In this part, we will use scikit-learn to train a MLP. Scikit-learn is an open-source Python library that provides tools for a wide range of machine learning tasks like including classification, regression, clustering, and dimensionality reduction. Among other functions, it provides the [MLP regressor](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor) class that we will use to create our first MLP.
 
 We will see in further depth how training works in the next section but to have a first grasp of the **training process**, here is a high-level description:
 
