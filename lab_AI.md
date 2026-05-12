@@ -27,8 +27,10 @@ This will install the following libraries:
 :::
 
 #include(assets/labs/modules/camera_calibration.md)
-#include(assets/labs/lab_AI/sections/3_scikit-learn.md)
+#include(assets/labs/lab_AI/sections/1_dataset.md)
+#include(assets/labs/lab_AI/sections/2_scikit-learn.md)
+#include(assets/labs/lab_AI/sections/3_from_scratch.md)
+#include(assets/labs/lab_AI/sections/4_pytorch.md)
 
 ## Appendix
 #include(assets/labs/lab_AI/sections/change_dataset.md)
-#include(assets/labs/lab_AI/sections/1_dataset.md)
