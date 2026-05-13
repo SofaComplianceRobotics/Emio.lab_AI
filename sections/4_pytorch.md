@@ -39,7 +39,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 ::: exercise
-**Exercise 4**
+**Exercise 1**
 Create a PyTorch version of the MLP with 2 layers of 128 neurons, and a logistic activation function.
 
 For the layers, use the `nn.Linear`. The logisitic function is `nn.Sigmoid()`
@@ -50,7 +50,7 @@ Now that you have your network, we need to tell it how to process data from the 
 
 
 ::: exercise
-**Exercise 5**
+**Exercise 2**
 
 Implement the `forward` method that implements the fact that the X input are to be processed by the first layer, then the result by the second layer then outputs the result. 
 
@@ -101,7 +101,7 @@ You probably wonder how to compute the loss and what is the optimizer.
 
 
 ::: exercise
-**Exercise 6**
+**Exercise 3**
 
 1. Code the training loop to train your model.
 It should train on 20000 epochs.
@@ -124,7 +124,7 @@ python train_model.py <model_type> <dataset_path>
 ### Evaluate it
 
 ::: exercise
-**Exercise 7**
+**Exercise 4**
 
 1. Implement the `score` in `modules/pytorch_MLP.py`.
 Use the r2_score_pytorch` function.
@@ -145,7 +145,7 @@ python evaluate_model.py <model_type> <dataset_path> <model_path>
 :::
 
 ::: exercise
-**Exercise 8**
+**Exercise 5**
 
 Use your model in the SOFA scene
 

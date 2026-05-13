@@ -41,6 +41,8 @@ It is possible to directly use the solutions provided by Scikit-learn: `mean_squ
 ## Initialization of the parameters and Forward Propagation
 We are going to build an MLP with two hidden layers of 128 neurons each. What are the dimensions of the input and output?
 
+::: exercise 
+**Exercise 1**
 Complete the following code:  
  ```python
     def initialization(input_dim, n1, n2, output_dim):
@@ -67,7 +69,9 @@ Click here to see the solution :
 
 #open-button("initialization.py")
 
-The foarward propagation refers to the computation of the output of the network based on the input.
+:::
+
+The forward propagation refers to the computation of the output of the network based on the input.
 
 Let  _A_ our activation function and $\mathcal{L}$  our loss function. 
 We use the __logistic__ function as the activation and the __mean squared error__ as loss in this lab.
@@ -78,6 +82,9 @@ $L=\frac{1}{m}\sum_{i=1}^{m}(y_i-\hat{y}_i)^2$
 
 Where _i_ is the index of the layer, _X_ the input, _W_ the weights, _b_ the bias, $\hat{y}$ the true output and `m` the number of samples.
 
+
+::: exercise 
+**Exercise 2**
 
 Complete the following code:
 ```python
@@ -111,13 +118,18 @@ Complete the following code:
 Click here to see the solution : 
 #open-button("forward_propagation.py")
 
+:::
+
 
 ## Backpropagation
 Backpropagation is an algorithm used to train neural networks by adjusting weights. It calculates the error between the predicted output and the actual output (loss) and propagates it backward through the network's layers. This is because the input of layer _i_ is the output of layer _i-1_.
 
 The partial derivatives (gradient) of the loss with respect to the weights W and biais b are used to update them via gradient descent.
 
-Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
+::: exercise 
+**Exercise 3**
+
+1. Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
 
 $\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} = ...$
 
@@ -131,8 +143,7 @@ $\frac{\partial \mathcal{L}}{\partial W_1} = ...$
 
 $\frac{\partial \mathcal{L}}{\partial b_1} = ...$
 
-
-When it is done complete the following code:
+2. When it is done complete the following code:
 
 ```python
     def back_propagation(X, y, parametres, activations):
@@ -170,6 +181,8 @@ When it is done complete the following code:
  ```
 Click here to see the solution in code : 
 #open-button("back_propagation.py")
+
+:::
 
 For the gradient descent, we use the easiest implementation. If you want, you can try to improve it, try using Adam instead. 
 ```python
@@ -216,7 +229,7 @@ You can find the rest of the code by clicking here :
 ## Train it
 
 ::: exercise 
-**Exercise**
+**Exercise 4**
 
 1. Complete the `train`function of `custom_MLP.py`
 
@@ -236,7 +249,7 @@ python train_model.py <model_type> <dataset_path>
 ## Evaluate it
 ### Without SOFA
 ::: exercise
-**Exercise**
+**Exercise 5**
 1. Implement the `score` in `modules/pytorch_MLP.py`.
 Use the r2_score_pytorch` function.
 
@@ -258,7 +271,7 @@ python evaluate_model.py <model_type> <dataset_path> <model_path>
 
 ### With SOFA
 ::: exercise
-**Exercise 8**
+**Exercise 6**
 
 Use your model in the SOFA scene
 
