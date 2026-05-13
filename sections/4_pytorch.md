@@ -1,9 +1,32 @@
 :::: collapse An MLP with PyTorch
-### PyTorch Installation
+
+PyTorch is an open-source machine learning framework primarily designed for deep learning, offering a dynamic computational graph that makes model development highly flexible and intuitive. It is widely favored by researchers and practitioners for its Pythonic interface and ease of use when tackling complex neural network architectures.
+
+PyTorch provides an easy way to create neural networks by subclassing the `torch.nn.Module` class, and implementing the `__init__` and `forward`  methods.
+
+```python
+class myNeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        
+        self.fc1 = nn.Linear(10, 4)
+        self.fc2 = nn.Linear(4, 2)
+
+    def forward(self, x)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return x
+```
+
+The above code implements the following neural network that takes an input of 10 values, that is fed to a hidden layer taking 4 input values, and an output layer with two values.
+Both of the activation functions are ReLu funcionts.
+
+![](assets/labs/lab_AI/data/images/nn.png){width="50%"}{class="center"}
+
 
 ### Your First MLP with PyTorch
 
-Create a MLP with two hidden layers of 128 nodes each and that will train on 20000 epochs. Given that you already have the x_train, y_train, x_test and y_test numpy rrays from the previous section.
+Create a MLP with two hidden layers of 128 nodes each and that will train on 20000 epochs. Given that you already have the x_train, y_train, x_test and y_test numpy arrays from the previous section.
 
 ```python
 import torch
