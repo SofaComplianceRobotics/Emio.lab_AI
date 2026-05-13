@@ -25,12 +25,14 @@ We will see in further depth how training works in the next section but to have 
 
 $$
 \begin{align*}
-    1. & \text{The parameters of the layers (weights and biases) are randomly initialized.} \\
+    1. & \text{The parameters of the layers (weights and biases) are randomly initialized} \\
     & \text{For each row of the dataset:} \\
-    & \hskip1em 2. \text{The input (position) from the dataset is passed through the MLP.} \\
-    & \hskip1em 3. \text{The output of the MLP (motor angles) is compared to the dataset output (the ground truth).} \\
-    & \hskip1em 4.\text{Update the parameters of the layers using gradient descent and backpropagation} \\
-    & \hskip1em 5. \text{Loop back to step 2 until maximum number of iterations or epochs is reached.}
+    & \hskip1em 2. \text{The input (position) from the dataset is passed through the MLP} \\
+    & \hskip1em 3. \text{Get the MLP ouput and the dataset output (the ground truth)} \\
+    & \hskip1em 4. \text{Calculate the gradient on the output data} \\
+    & \hskip1em 5. \text{Backpropagate the gradients} \\
+    & \hskip1em 6. \text{Update the weights and bias of the layers using gradient descent and backpropagation} \\
+    & \hskip1em 7. \text{Loop back to step 2 until maximum number of iterations or epochs is reached}
 \end{align*}
 $$
 
@@ -91,8 +93,8 @@ r^2 = 1 - \frac{\ssres}{\sstot}
 
 \begin{array}{ll}
 \text{where:} \\
-\quad y_i & \text{observed data point} \\
-\quad \hat{y}_i & \text{predicted value} \\
+\quad y_i & \text{predicted value} \\
+\quad \hat{y}_i & \text{observed data point} \\
 \quad \bar{y} & \text{mean of observed data points}
 \end{array}
 $$
