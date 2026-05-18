@@ -89,15 +89,14 @@ $$
 \def\ssres{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
 \def\sstot{\sum_{i=1}^{n} (y_i - \bar{y})^2}
 
-r^2 = 1 - \frac{\ssres}{\sstot}
-
-\\[1em]
-
-\begin{array}{ll}
-\text{where:} \\
-\quad y_i & \text{predicted value} \\
-\quad \hat{y}_i & \text{observed data point} \\
-\quad \bar{y} & \text{mean of observed data points}
+\begin{array}{c}
+    r^2 = 1 - \dfrac{\ssres}{\sstot} \\[1.5em]
+    \begin{array}{ll}
+        \text{where:} \\
+        \quad y_i & \text{predicted value} \\
+        \quad \hat{y}_i & \text{observed data point} \\
+        \quad \bar{y} & \text{mean of observed data points}
+    \end{array}
 \end{array}
 $$
 
