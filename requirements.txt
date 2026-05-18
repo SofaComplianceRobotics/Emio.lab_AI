@@ -2,3 +2,4 @@ matplotlib
 scikit-learn
 pandas
 libusb1
+torch

@@ -1,4 +1,4 @@
-:::: collapse An MLP with PyTorch
+::::: collapse An MLP with PyTorch
 
 PyTorch is an open-source machine learning framework primarily designed for deep learning, offering a dynamic computational graph that makes model development highly flexible and intuitive. It is widely favored by researchers and practitioners for its Pythonic interface and ease of use when tackling complex neural network architectures.
 
@@ -107,52 +107,54 @@ You probably wonder how to compute the loss and what is the optimizer.
 It should train on 20000 epochs.
 
 2. Complete the `train` function in `modules/pytorch_MLP.py`
+    #open-button(file="assets/labs/lab_AI/modules/pytorch_MLP.py")
 
-3. Train it the model, using the `train_model.py`: 
-```bash
-python train_model.py <model_type> <dataset_path>
-```
+3. Train it the model, using the dataset you want: 
+    #input("pytorch_training_dataset", "data/results/YOUR_DATASET.csv", "data/results/blueleg_beam_cube1331.csv")
 
-- model_type: `custom`, `scikit-learn`, `pytorch`
-- dataset_path: `PATH/TO/DATASET.csv`
-- the trained model save path is `data/results/model_MODELTYPE.ext`
-    - pytorch will save `pth` files
-    - scikit-learn and custom will save `joblib` files
+    #python-button(file="assets/labs/lab_AI/train_model.py", pyargs=["pytorch", "pytorch_training_dataset"])
 
 :::
 
 ### Evaluate it
+To systematically evaluate the model performance, we need to implement the `score` function. We will still use the $r^2$ score introduced before implemented in `r2_score_pytorch`. 
+The idea here is to infer sequentially on batches of the dataset to compare the predictions of our newly trained model with the ground truth from the dataset by calculating the $r^2$ score.
 
-::: exercise
+The alogrithm for the `score` function is:
+1. Set te model in _eval_ mode
+2. Load the dataset
+3. Infer for each batch
+4. Append the inference values and ground truth into arrays
+5. After all batches compute the $r^2$ score
+
+:::: exercise
 **Exercise 4**
 
 1. Implement the `score` in `modules/pytorch_MLP.py`.
-Use the r2_score_pytorch` function.
+    - use the `r2_score_pytorch` function that takes `torch.Tensors` of the ground truth and the predicted values as arguments.
+    - use the `torch.cat()` function to concatenate the predicted and ground truth lists of tensors
+    #open-button(file="assets/labs/lab_AI/modules/pytorch_MLP.py")
+    <br/>
 
-2. Evaluate it by calling
-```bash
-python evaluate_model.py <model_type> <dataset_path> <model_path>
-```
+2. Evaluate the model using the dataset and model you want:
 
-- model_type: `custom`, `scikit-learn`, `pytorch`
-- dataset_path: `PATH/TO/DATASET`
-    - pytorch expects `pth` files
-    - scikit-learn and custom expct `joblib` files
-- model_path: `PATH/TO/MODEL`
-    - pytorch expects `pth` files
-    - scikit-learn and custom expect `joblib` files
+    Dataset path: 
+        #input("pytorch_eval_dataset", "data/results/YOUR_MODEL.pth", "data/results/model_pytorch_sphere.pth")
 
-:::
+    <br/>
 
-::: exercise
-**Exercise 5**
+    Model path: 
+        #input("pytorch_eval_model", "data/results/YOUR_MODEL.pth", "data/results/model_pytorch_sphere.pth")
 
-Use your model in the SOFA scene
+    #python-button(file="assets/labs/lab_AI/evaluate_model.py", pyargs=["pytorch", "pytorch_eval_dataset", "pytorch_eval_model"])
 
-If you want to use your own model: 
-#input("eval_pytorch_model_path", "Path to the model pth file", "data/results/model_pytorch_cube.pth")
+    <br/>
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "plane", "0.1")
-:::
+3. Use your model in the SOFA scene to visualize its performance.
 
-::::
+    If you want to use your own model: 
+    #input("pytorch_eval_sofa_model_path", "Path to the model pth file", "data/results/model_pytorch_cube.pth")
+
+    #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "pytorch_eval_sofa_model_path", "plane", "0.1")
+
+:::::
