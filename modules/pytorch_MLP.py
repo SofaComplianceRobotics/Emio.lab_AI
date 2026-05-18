@@ -28,12 +28,12 @@ class PytorchMLPReg(BaseModel):
         self.batch_size = batch_size
         self.model_file = model_file
         self.model = self.MLPRegressor(input_size, output_size)
-        if model_file:
-            self.load(model_file)
-            print(f"[PyTorchMLPReg] Loaded model from {model_file}")
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.model.to(self.device)
         print(f"[PyTorchMLPReg] Using device: {self.device}")
+        if model_file:
+            self.load(model_file)
+            print(f"[PyTorchMLPReg] Loaded model from {model_file}")
     
 
     def save(self, file_path):
@@ -41,7 +41,7 @@ class PytorchMLPReg(BaseModel):
     
 
     def load(self, file_path):
-        self.model.load_state_dict(torch.load(file_path, weights_only=True))
+        self.model.load_state_dict(torch.load(file_path, weights_only=True, map_location=self.device))
         self.model.eval()
 
 
@@ -55,7 +55,7 @@ class PytorchMLPReg(BaseModel):
     
 
     def score(self, X_test, y_test) -> float:
-        self.model.eval()
+        self.model.eval() # turn on evaluation mode 
         # if x_test and y_test are numpy arrays, convert them to tensors
         if isinstance(X_test, np.ndarray):
             X_test = torch.from_numpy(X_test).float().to(self.device)
@@ -64,20 +64,22 @@ class PytorchMLPReg(BaseModel):
         test_dataset = TensorDataset(X_test, y_test)
         test_loader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
 
-        with torch.no_grad():
+        with torch.no_grad(): # deactivate gradient computation
             all_y_true = []
             all_y_pred = []
             for batch_X, batch_y in test_loader:
                 outputs = self.model(batch_X)
                 all_y_true.append(batch_y)
                 all_y_pred.append(outputs)
+
+            # concatenate tensor lists to tensors
             y_true = torch.cat(all_y_true, dim=0)
             y_pred = torch.cat(all_y_pred, dim=0)
-            r2 = r2_score_pytorch(y_true, y_pred)
+        r2 = r2_score_pytorch(y_true, y_pred)
         return r2
     
 
-    def train(self, X_train, y_train, X__test=None, y_test=None):
+    def train(self, X_train, y_train, X_test=None, y_test=None):
         # Set random seed for reproducibility (like random_state=1)
         torch.manual_seed(1)
 
@@ -87,7 +89,7 @@ class PytorchMLPReg(BaseModel):
         dataset = TensorDataset(X_train, y_train)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
-        if X__test is not None and y_test is not None:
+        if X_test is not None and y_test is not None:
             X_test = torch.from_numpy(X_test).float().to(self.device)
             y_test = torch.from_numpy(y_test).float().to(self.device)
             test_dataset = TensorDataset(X_test, y_test)
@@ -109,7 +111,7 @@ class PytorchMLPReg(BaseModel):
             # Évaluation toutes les 1000 époques
             if epoch % 1000 == 0:
                 print(f"[PyTorchMLPReg] Epoch {epoch}, Train Loss: {loss.item():.4f}")
-                if X__test is not None and y_test is not None:
+                if X_test is not None and y_test is not None:
                     self.model.eval()
                     with torch.no_grad():
                         test_loss = 0.0
