@@ -26,17 +26,27 @@ We will see in further depth how training works in the next section but to have 
 To do that, it follows this high-level algorithm:
 
 $$
-\begin{align*}
-    1. & \text{The parameters of the layers (weights and biases) are randomly initialized} \\
-    & \text{For each row of the dataset:} \\
-    & \hskip1em 2. \text{The input (position) from the dataset is passed through the MLP} \\
-    & \hskip1em 3. \text{Get the MLP ouput and the dataset output (the ground truth)} \\
-    & \hskip1em 4. \text{Calculate the gradient on the output data} \\
-    & \hskip1em 5. \text{Backpropagate the gradients} \\
-    & \hskip1em 6. \text{Update the weights and bias of the layers using gradient descent and backpropagation} \\
-    & \hskip1em 7. \text{Loop back to step 2 until maximum number of iterations or epochs is reached}
-\end{align*}
+\begin{array}{l}
+\textbf{Algorithm: Gradient Descent Training} \\[0.5em]
+\hline \\[-0.5em]
+\textbf{Input: } \text{Learning rate } \alpha,\ \text{dataset } \mathcal{D},\ \text{max epochs } T \\
+\textbf{Output: } \text{Trained weights } w \text{ and bias } b \\[0.5em]
+\hline \\[-0.5em]
+1.\ \text{Initialize } w,\ b \leftarrow \text{random} \\
+2.\ \textbf{for } t = 1 \textbf{ to } T \textbf{ do} \\
+3.\ \quad \textbf{for each } (x, y) \in \mathcal{D} \textbf{ do} \\
+4.\ \qquad \hat{y} \leftarrow \text{MLP}(x,\ w,\ b) \\
+5.\ \qquad \mathcal{L} \leftarrow \text{Loss}(\hat{y},\ y) \\
+6.\ \qquad \nabla_{w}, \nabla_{b} \leftarrow \text{Backprop}(\mathcal{L}),\ \forall l \\
+7.\ \qquad w \leftarrow w - \alpha \cdot \nabla_w \\
+8.\ \qquad b \leftarrow b - \alpha \cdot \nabla_b \\
+9.\ \quad \textbf{end for} \\
+10.\ \textbf{end for} \\
+11.\ \textbf{return } w,\ b
+\end{array}
 $$
+
+Backpropagation takes the loss, computes the gradient of the loss with respect to each parameter layer by layer (via the chain rule), going from the output layer back to the input layer. So the input of the backpropagation is the loss, but what it produces is the set of gradients of the loss with report to the weights and bias of each layer.
 
 #### Create a MLP and train it
 Scikit-learn comes with its own implementation of an [MLP regressor](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor).
@@ -93,8 +103,8 @@ $$
     r^2 = 1 - \dfrac{\ssres}{\sstot} \\[1.5em]
     \begin{array}{ll}
         \text{where:} \\
-        \quad y_i & \text{predicted value} \\
-        \quad \hat{y}_i & \text{observed data point} \\
+        \quad y_i & \text{observed data points} \\
+        \quad \hat{y}_i & \text{predicted value} \\
         \quad \bar{y} & \text{mean of observed data points}
     \end{array}
 \end{array}
