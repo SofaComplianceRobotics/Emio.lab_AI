@@ -10,7 +10,7 @@ In the folder `home/emio-labs/<VERSION>/assets/labs/lab_AI/data/results` you can
 
 1. Select your csv (or see following section to create your own data set). Here we will select a dataset obtained by systematicallty moving each motor to seven positions (7x7x7x7 configurations): 
 2. Open a terminal:
-    #python-button("-c ''")
+    #python-button(pyargs=["-c ''"])
 
 3. Enter the following commands:
 
@@ -32,7 +32,7 @@ Open the simulation and observe the result:
     #input("dataset_sklearn_path", "Path to the dataset file", "data/results/blueleg_beam_direct625.csv")
 
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "scikit-learn", "eval2_sklearn_model_path", "plane", "0.1", "dataset_sklearn_path")
+#runsofa-button(file="assets/labs/lab_AI/lab_AI_test.py", pyargs=["scikit-learn", "eval2_sklearn_model_path", "plane", "0.1", "dataset_sklearn_path"])
 
 
 :::

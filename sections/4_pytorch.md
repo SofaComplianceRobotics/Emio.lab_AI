@@ -155,6 +155,6 @@ The alogrithm for the `score` function is:
     If you want to use your own model: 
     #input("pytorch_eval_sofa_model_path", "Path to the model pth file", "data/results/model_pytorch_cube.pth")
 
-    #runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "pytorch_eval_sofa_model_path", "plane", "0.1")
+    #runsofa-button(file="assets/labs/lab_AI/lab_AI_test.py", pyargs=["pytorch", "pytorch_eval_sofa_model_path", "plane", "0.1"])
 
 :::::

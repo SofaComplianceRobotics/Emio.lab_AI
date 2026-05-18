@@ -67,7 +67,7 @@ Complete the following code:
  ```
 Click here to see the solution :
 
-#open-button("initialization.py")
+#open-button(file="initialization.py")
 
 :::
 
@@ -116,7 +116,7 @@ Complete the following code:
  ```
 
 Click here to see the solution : 
-#open-button("forward_propagation.py")
+#open-button(file="forward_propagation.py")
 
 :::
 
@@ -180,7 +180,7 @@ $\frac{\partial \mathcal{L}}{\partial b_1} = ...$
     return gradients
  ```
 Click here to see the solution in code : 
-#open-button("back_propagation.py")
+#open-button(file="back_propagation.py")
 
 :::
 
@@ -223,7 +223,7 @@ For the gradient descent, we use the easiest implementation. If you want, you ca
 
 
 You can find the rest of the code by clicking here : 
-#open-button("MPL_regression_from_scratch.py")
+#open-button(file="MPL_regression_from_scratch.py")
 
 
 ## Train it
@@ -278,7 +278,7 @@ Use your model in the SOFA scene
 Use your own model: 
 #input("eval_custom_model_path", "Path to the model joblib file", "data/results/model_custom.joblib")
 
-#runsofa-button("assets/labs/lab_AI/lab_AI_test.py", "pytorch", "eval_pytorch_model_path", "plane", "0.1")
+#runsofa-button(file="assets/labs/lab_AI/lab_AI_test.py", pyargs=["pytorch", "eval_pytorch_model_path", "plane", "0.1"])
 :::
 
 ::::::
