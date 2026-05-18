@@ -17,7 +17,7 @@ A summary of this is in the diagram below:
 
 ![](assets/labs/lab_AI/data/images/context_diagram.png)
 
-### Train the Model and Test it
+### Create, Train and Test your MLP
 
 In this part, we will use scikit-learn to train a MLP. Scikit-learn is an open-source Python library that provides tools for a wide range of machine learning tasks like including classification, regression, clustering, and dimensionality reduction. Among other functions, it provides the [MLP regressor](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor) class that we will use to create our first MLP.
 
@@ -87,11 +87,13 @@ Note that we used the dataset called `blueleg_beam_sphere515.csv`. This is becau
 
 :::
 
-#### Evaluate the model
+#### Evaluation of the MLP
 
-In Machine learning, an common evaluation metric is the $r^{2}$ score or coefficient of determination. Essentially, it measures the proportion of the variance in the dependent variable that is predictable from the independent variables in the model.
+In Machine learning, a common evaluation metric is the $R^{2}$ score (coefficient of determination). 
+It measures the proportion of the variance in the dependent variable that is predictable from the independent variables in the model.
+Basically, the $R^{2}$ score measures how well the model predicts the outputs.
 
-A high value indicates that the models highly fits the data.
+<!-- A high value indicates that the models highly fits the data.-->
 
 The general mathematical definition is:
 
@@ -99,20 +101,36 @@ $$
 \def\ssres{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
 \def\sstot{\sum_{i=1}^{n} (y_i - \bar{y})^2}
 
-\begin{array}{c}
-    r^2 = 1 - \dfrac{\ssres}{\sstot} \\[1.5em]
-    \begin{array}{ll}
-        \text{where:} \\
-        \quad y_i & \text{observed data points} \\
-        \quad \hat{y}_i & \text{predicted value} \\
-        \quad \bar{y} & \text{mean of observed data points}
-    \end{array}
+
+R^2 = 1 - \frac{\ssres}{\sstot}
+
+\\[1em]
+
+\begin{array}{ll}
+\text{where:} \\
+\quad y_i & \text{ground-truth value (from the dataset) } \\
+\quad \hat{y}_i & \text{predicted values} \\
+\quad \bar{y} & \text{mean of predicted values}
 \end{array}
 $$
 
+In our case, $y_i$ is the ground-truth motor angles from the dataset, ($y = (m_0, m_1, m_2, m_3)$), 
+and $\hat{y}_i$ is the motor-angle vector predicted by the MLP for a given end-effector position ($pos = (x,y,z)$).
+ 
+**Interpretation** The $R^{2}$ value is expected to lie between 0 and 1:
+- 0 means the model explains none of the variability in the data very
+(0 and small values describe a useless model) 
+- 1 means the model explains all the variability
+(careful. This could describe an overfitted model) 
+- Values closer to 1 show that the model is capturing most of thr variability
+(usually a better fit)
 
-##### Without the simulation
-You can use the [MLPRegressor.score](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor.score) method to calculate the coefficient of determination on the test data.
+##### Evaluate your model without the simulation
+<!-- You can use the [MLPRegressor.score](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor.score) method to calculate the coefficient of determination on the test data.-->
+
+Here, you will perform an offline (dataset-only) evaluation of your MLP before usging it in SOFA or on the real robot.
+The goal is to check how well your model can predict motor angles from the end-effector position on unseen data. 
+In scikit-learn, you can compute the coefficient of determination on the test data using the [MLPRegressor.score](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor.score):
 
 ```python
 mlp.score(X_test, y_test)
@@ -141,12 +159,16 @@ You should have a score that is quite low. This is mostly due to the fact the ML
 :::
 
 
-##### With the SOFA simulation
-Now that you have a theoretically good-enough model, lets use it in simulation!
+##### Evaluate your model with the SOFA simulation
+Now that you have a theoretically good-enough model, you can use use it in SOFA simulation!
 
-The trained model will be used to compute the robot’s inverse kinematics; that is, for a desired position in space, the MLP will provide the corresponding motor positions. This is the foundation of control and motion planning in robotics.
+In  this step, the trained MLP will be used as a data-driven inverse kinematics model of Emio: 
+- Input: a desired end-effector position ($pos = (x, y, z)$)
+- Output: the predicted motor angles ($m = (m_0, m_1, m_2, m_3)$)
 
-In the **Plotting** window, you can see the $r^2$ score calculated over the last points.
+This is the basis of many robotics workflows such as control and motion planning, where a Cartesian target is converted into actuation commands.
+
+In the **Plotting** window, you can observe the $R^2$ score calculated over the last points.
 
 ::: exercise
 **Exercise 3**
