@@ -1,4 +1,4 @@
-::::: collapse An MLP with PyTorch
+::::: collapse An MLP for robotics with PyTorch
 
 PyTorch is an open-source machine learning framework primarily designed for deep learning, offering a dynamic computational graph that makes model development highly flexible and intuitive. It is widely favored by researchers and practitioners for its Pythonic interface and ease of use when tackling complex neural network architectures.
 

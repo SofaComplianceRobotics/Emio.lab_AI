@@ -1,4 +1,4 @@
-:::: collapse A MLP for robotics with sickit-learn
+:::: collapse An MLP for robotics with scikit-learn
 
 **Goal**: better understand how neural networks can be used for robotics and simulation
 
@@ -17,7 +17,7 @@ A summary of this is in the diagram below:
 
 ![](assets/labs/lab_AI/data/images/context_diagram.png)
 
-### Create, Train and Test your MLP
+### Create, Train and Test your MLP using scikit-learn
 
 In this part, we will use scikit-learn to train a MLP. Scikit-learn is an open-source Python library that provides tools for a wide range of machine learning tasks like including classification, regression, clustering, and dimensionality reduction. Among other functions, it provides the [MLP regressor](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor) class that we will use to create our first MLP.
 
@@ -48,7 +48,7 @@ $$
 
 Backpropagation takes the loss, computes the gradient of the loss with respect to each parameter layer by layer (via the chain rule), going from the output layer back to the input layer. So the input of the backpropagation is the loss, but what it produces is the set of gradients of the loss with report to the weights and bias of each layer.
 
-#### Create a MLP and train it
+#### Create an MLP and train it
 Scikit-learn comes with its own implementation of an [MLP regressor](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html#sklearn.neural_network.MLPRegressor).
 
 You can use it here for a quick exploration of the architecture needed.

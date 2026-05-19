@@ -1,9 +1,17 @@
-:::::: collapse Create your MLP from scratch
+:::::: collapse An MLP for robotics from scratch
 
-This part is dedicated to create your own MLP from scratch. This is a supervised learning problem. We want to solve a regression problem. With this in mind, propose a cost function and a scoring function to quantify the quality of the predictions. We will build an MLP with two hidden layers of 128 neurons each.
+**Goal**: build and understand a complete MLP training pipeline from scratch, and apply it to a 
+
+We formulate the problem as a supervised regression problem:
+given an end-effector position ($pos=(x,y,z)$), the network predicts the corresponding vector of motor 
+angles ($m=(m_0,m_1,m_2,m_3)$). In other words, we want to learn an approximation of an inverse
+kinematics function directly from data.
+
+In this part, you will implement a baseline MLP with two heedn layers of 128 neurons each (as shown in the image below). 
+You will then follow the same workflow used in the previous section: ctrate, train, evaluate, and test the model.
 
 
-We will need the followings : 
+You will need the following libraries: 
 
 ```python
     import numpy as np
@@ -11,7 +19,17 @@ We will need the followings :
     from sklearn.metrics import r2_score, mean_squared_error
     from tqdm import tqdm
 ```
-## The Neuron
+
+### Create, Train and Test your MLP from scratch
+The creation of the MLP from scratch relies on the neuron and ...
+
+MLP training pipeline from scratch: starting from an MLP definition (forward pass), 
+you will train it by optimizing its weights to minimize a regression loss using backpropagation 
+(chain rule) and gradient descent, then evaluate the resulting model with standard metrics.
+
+#### Creating your MLP from scratch (architecture + forward pass)
+
+##### The Neuron
 A neuron is a function that takes inputs, applies weights and a bias, then passes the result through an activation function to produce an output.
 
 The mathematical representation of a neuron is as follows:
@@ -24,6 +42,7 @@ Where:
 - _b_ is the bias (parameter)
 - _Z_ is the weighted sum (linear combination)
 - _A_ is the output after applying the activation function (ReLU in this case)
+
 
 ## Loss function and Scoring function
 A cost function and a scoring function quantify the quality of predictions. 
@@ -44,6 +63,10 @@ We are going to build an MLP with **two hidden layers** of 128 neurons each.
 What are the dimensions of the input and output?
 
 ![](assets/labs/lab_AI/data/images/nn_3-128-128-4.svg){width=80%}{.center}
+
+#### Initialization of the parameters and Forward Propagation
+We are going to build an MLP with two hidden layers of 128 neurons each. What are the dimensions of the input and output?
+
 
 ::: exercise 
 **Exercise 1**
@@ -124,16 +147,39 @@ Click here to see the solution :
 
 :::
 
+#### Training your MLP (Backpropagation + gradient descent)
 
-## Backpropagation
-Backpropagation is an algorithm used to train neural networks by adjusting weights. It calculates the error between the predicted output and the actual output (loss) and propagates it backward through the network's layers. This is because the input of layer _i_ is the output of layer _i-1_.
+For training, you will 
+- (i) define a loss (cost) function to train the network by optimizing its parameters, and 
+- (ii) define a scoring metric to quantify prediction quality and compare models.
+
+#### Loss function and Scoring function
+A cost function and a scoring function quantify the quality of predictions. 
+
+Depending on your problem, you might want to use different functions. 
+
+For the remainder of the lesson, we will use the following loss function, the mean squared error (MSE) for regression: 
+$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+
+and for the scoring function, the coefficient of determination ($R^2$):
+$$R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}$$
+
+It is possible to directly use the solutions provided by Scikit-learn: `mean_squared_error()` and `r2_score()`.
+
+
+#### Backpropagation
+Backpropagation is an algorithm used to train neural networks by adjusting weights. 
+It calculates the error between the predicted output and the actual output (loss) and propagates 
+it backward through the network's layers. This is because the input of layer _i_ is the output of layer _i-1_.
 
 The partial derivatives (gradient) of the loss with respect to the weights W and biais b are used to update them via gradient descent.
 
 ::: exercise 
 **Exercise 3**
 
-1. Use the forward propagation to find the back propagation by expressing the following expressions that will be used for the gradient descent since W and b are what we want to optimize during the training. Use the chain rule as in the first expression:
+1. Use the forward propagation to find the back propagation by expressing the following 
+expressions that will be used for the gradient descent since W and b are what we want 
+to optimize during the training. Use the chain rule as in the first expression:
 
 $\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} = ...$
 
@@ -230,7 +276,7 @@ You can find the rest of the code by clicking here :
 #open-button(file="MPL_regression_from_scratch.py")
 
 
-## Train it
+#### Training the MLP
 
 ::: exercise 
 **Exercise 4**
@@ -250,8 +296,10 @@ python train_model.py <model_type> <dataset_path>
 
 ::: 
 
-## Evaluate it
-### Without SOFA
+### Evaluation of the MLP
+In this section, just like in the MLP with scikitlearn, you will first evaluate your model offline before using it in the SOFA simulation.
+
+#### Evaluate your model Without the simulation
 ::: exercise
 **Exercise 5**
 1. Implement the `score` in `modules/pytorch_MLP.py`.
@@ -273,7 +321,7 @@ python evaluate_model.py <model_type> <dataset_path> <model_path>
 
 :::
 
-### With SOFA
+#### Evaluate your model With the SOFA simulation
 ::: exercise
 **Exercise 6**
 
