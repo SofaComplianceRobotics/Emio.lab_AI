@@ -39,7 +39,11 @@ $$R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar
 It is possible to directly use the solutions provided by Scikit-learn: `mean_squared_error()` and `r2_score()`.
 
 ## Initialization of the parameters and Forward Propagation
-We are going to build an MLP with two hidden layers of 128 neurons each. What are the dimensions of the input and output?
+We are going to build an MLP with **two hidden layers** of 128 neurons each. 
+
+What are the dimensions of the input and output?
+
+![](assets/labs/lab_AI/data/images/nn_3-128-128-4.svg){width=80%}{.center}
 
 ::: exercise 
 **Exercise 1**

@@ -21,7 +21,7 @@ class myNeuralNetwork(nn.Module):
 The above code implements the following neural network that takes an input of 10 values, that is fed to a hidden layer taking 4 input values, and an output layer with two values.
 Both of the activation functions are ReLu funcionts.
 
-![](assets/labs/lab_AI/data/images/nn.png){width="50%"}{class="center"}
+![](assets/labs/lab_AI/data/images/nn_10-4-2.svg){width=65%}{.center}
 
 
 ### Your First MLP with PyTorch

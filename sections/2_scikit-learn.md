@@ -72,6 +72,9 @@ mlp.fit(X_train, y_train) # train the model using the X_train dataframe of the f
 
 In the code above, since our features are the components of a 3D position, we have 3 features as input. Regarding the output, since we want the 4 angles of the 4 motors, the output of the MLP is four values.
 
+![](assets/labs/lab_AI/data/images/nn_3-100-4.svg){width=65%, .center}
+
+
 ::: exercise
 **Exercise 1**
 
