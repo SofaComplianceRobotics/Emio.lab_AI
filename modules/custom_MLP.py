@@ -79,13 +79,13 @@ class CustomANN2Layers(BaseModel):
         W3 = parametres['W3']
         m = y.shape[1]
         dZ3 = (2 / m) * (A3 - y)
-        dW3 = dZ3.dot(A2.T)
+        dW3 = dZ3.dot(A2.T) / m # divide by m because we want the average gradient over the batch
         db3 = np.sum(dZ3, axis=1, keepdims=True) / m
-        dZ2 = np.dot(W3.T, dZ3) * A2 * (1 - A2)
-        dW2 = dZ2.dot(A1.T)
+        dZ2 = np.dot(W3.T, dZ3) * A2 * (1 - A2) 
+        dW2 = dZ2.dot(A1.T) / m 
         db2 = np.sum(dZ2, axis=1, keepdims=True) / m
         dZ1 = np.dot(W2.T, dZ2) * A1 * (1 - A1)
-        dW1 = dZ1.dot(X.T)
+        dW1 = dZ1.dot(X.T) / m
         db1 = np.sum(dZ1, axis=1, keepdims=True) / m
         gradients = {
             'dW1': dW1,

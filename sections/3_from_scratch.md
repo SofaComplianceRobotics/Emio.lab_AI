@@ -93,37 +93,51 @@ Where _i_ is the index of the layer, _X_ the input, _W_ the weights, _b_ the bia
 ::: exercise 
 **Exercise 2**
 
-Complete the following code:
-```python
-    def forward_propagation(X, parametres):
+1. Complete the following code:
+    ```python
+        def forward_propagation(X, parametres):
 
-    W1 = parametres['W1']
-    b1 = parametres['b1']
-    W2 = parametres['W2']
-    b2 = parametres['b2']
-    W3 = parametres['W3']
-    b3 = parametres['b3']
+        W1 = parametres['W1']
+        b1 = parametres['b1']
+        W2 = parametres['W2']
+        b2 = parametres['b2']
+        W3 = parametres['W3']
+        b3 = parametres['b3']
 
-    Z1 = #...
-    A1 = #...
+        Z1 = #...
+        A1 = #...
 
-    Z2 = #...
-    A2 = #...
+        Z2 = #...
+        A2 = #...
 
-    Z3 = #...
-    A3 = #... #no activation function on the last layer for regression
-   
-    activations = {
-        'A1': A1,
-        'A2': A2,
-        'A3': A3 
-    }
+        Z3 = #...
+        A3 = #... #no activation function on the last layer for regression
+    
+        activations = {
+            'A1': A1,
+            'A2': A2,
+            'A3': A3 
+        }
 
-    return activations
- ```
+        return activations
+    ```
 
-Click here to see the solution : 
-#open-button(file="forward_propagation.py")
+    Click here to see the solution : 
+    #open-button(file="forward_propagation.py")
+
+2. Now for each mactrices and vectors, give their dimensions during the forward pass. For example, for $W_1$, the dimensions are $[128, 3]$ since it has to be multiplied by the input $X$ of dimensions $[3, 1]$ to give $Z_1$ of dimensions $[128, 1]$.
+- $W_1: [128, 3]$
+- $A_1: [128, 1]$
+- $b_1: [128, 1]$
+- $Z_1: [128, 1]$
+- $W_2: [128, 128]$
+- $A_2: [128, 1]$
+- $b_2: [128, 1]$
+- $Z_2: [128, 1]$
+- $W_3: [4, 128]$
+- $b_3: [4, 1]$
+- $Z_3: [4, 1]$
+- $A_3: [4, 1]$
 
 :::
 
@@ -152,36 +166,55 @@ Backpropagation is an algorithm used to train neural networks by adjusting weigh
 It calculates the error between the predicted output and the actual output (loss) and propagates 
 it backward through the network's layers. This is because the input of layer _i_ is the output of layer _i-1_.
 
-The partial derivatives (gradient) of the loss with respect to the weights W and biais b are used to update them via gradient descent.
+The partial derivatives (gradient) of the loss with respect to the weights $W_i$ and biais $b_i$ are used to update them via gradient descent.
+
+##### Chain Rule
+<span style="color: red;"> TODO: Explain the chain rule in derivatives calulation for backpropagation </span>
+
+The chain rule is a fundamental concept in calculus that allows us to compute the derivative of a composite function.
+
+##### Batch training
+In practice, we train our MLP on batches of data, meaning that several samples are processed simultaneously. This allows for more efficient computation and can lead to faster convergence during training.
+
+During batch training, the dimensions of the matrices and vectors are different since we train on batches of data. The input $X$ has dimensions $[3, m]$ where `m` is the batch size, and $Z_3$ and $A_3$ have dimensions $[4, m]$. However, the dimensions of the weights and bias remain the same since they are shared across all samples in the batch.
+
+<span style="color: red;"> TODO: Explain that because of the batch training, the gradients are computed as averages over the batch. This is why we have to introduce division by `m` and that we can replace the element-wise multiplication with a dot product. Because we are computing the average, the sum can be replaced with a dot product (which is more efficient).</span>
+
+##### Broadcasting
+Broadcasting is a mechanism that allows operations to be performed on arrays of different shapes. It expands the smaller array to match the shape of the larger array during arithmetic operations. This is particularly useful in neural network computations where we often need to perform operations between arrays of different dimensions, such as adding a bias vector to a matrix of activations.
+
+For example, when we compute the weighted sum $Z = W.X + b$, if $W$ has dimensions $[128, 3]$, $X$ has dimensions $[3, m]$, and $b$ has dimensions $[128, 1]$, the addition of $b$ to the product $W.X$ is facilitated by broadcasting. The bias vector $b$ is  expanded to match the shape of the product $W.X$ giving a bias term of size $[128, m]$, allowing for element-wise addition without the need for explicit reshaping.
 
 ::: exercise 
 **Exercise 3**
 
 1. Use the forward propagation to find the back propagation by expressing the following 
 expressions that will be used for the gradient descent since W and b are what we want 
-to optimize during the training. Use the chain rule as in the first expression:
+to optimize during the training. 
+Use the chain rule as in the first expression.
 
 $$
 \begin{array}{ll}
 \text{Output layer 3:} & \\
 &\begin{align*}
     &dW_3 = \frac{\partial \mathcal{L}}{\partial W_3}
-        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial W_3} 
-        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial W_3}
-        = \textcolor{green}{dZ3} \cdot A2^T
+        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} 
+        = \textcolor{green}{dZ3} * \frac{\partial Z_3}{\partial W_3}
+        = \frac{1}{m}\textcolor{green}{dZ3} \cdot A_2^T
 
     \\[1em]
 
     &db_3 = \frac{\partial \mathcal{L}}{\partial b_3}
-        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial b_3} 
-        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial b_3}
-        = \textcolor{green}{dZ3} \cdot 1
+        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial b_3} 
+        = \textcolor{green}{dZ3} * \frac{\partial Z_3}{\partial b_3}
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{green}{dZ3_{:, j}} * 1 \\
+        &\text{(transforming dZ3 from [4, m] to [4, 1] by averaging over the batch dimension m)}
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3} = \frac{2}{m}(A3 - y) 
+    \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial A_3}* \frac{\partial A_3}{\partial Z_3} = \frac{2}{m}(A_3 - y) 
 \end{align*}
 
 \\[1em]
@@ -189,22 +222,22 @@ $$
 \text{Layer 2:} & \\
 &\begin{align*}
     &dW2 = \frac{\partial \mathcal{L}}{\partial W_2}
-        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial W_2}
-        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial W_2}
-        = \textcolor{red}{dZ2} \cdot A1^T
+        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial W_2}
+        = \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial W_2}
+        = \frac{1}{m}\textcolor{red}{dZ2} \cdot A1^T
 
     \\[1em]
 
     &db2 = \frac{\partial \mathcal{L}}{\partial b_2}
-        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial b_2}
-        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial b_2}
-        = \textcolor{red}{dZ2} \cdot 1
+        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial b_2}
+        = \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial b_2}
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{red}{dZ2_{:, j}} * 1
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{red}{dZ2} = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2} = W3^T \cdot \textcolor{green}{dZ3} \cdot A2 \cdot (1 - A2)
+    \text{where } \textcolor{red}{dZ2} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2} = W_3^T \cdot \textcolor{green}{dZ3} * A_2 \cdot (1 - A_2)
 \end{align*}
 
 \\[1em]
@@ -212,32 +245,43 @@ $$
 \text{Layer 1:} & \\
 &\begin{align*}
     dW1 = \frac{\partial \mathcal{L}}{\partial W_1}
-        & = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}\cdot\frac{\partial Z_1}{\partial W_1} \\
-        & = \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial W_1}
-        = \textcolor{blue}{dZ1} \cdot X^T
+        & = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}*\frac{\partial Z_1}{\partial W_1} \\
+        & = \textcolor{blue}{dZ1} * \frac{\partial Z_1}{\partial W_1}
+        = \frac{1}{m} \textcolor{blue}{dZ1} \cdot X^T
 \end{align*}
 
 \\[1em]
 
 &\begin{align*}
     db1 = \frac{\partial \mathcal{L}}{\partial b_1}
-        &= \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}\cdot\frac{\partial Z_1}{\partial b_1} \\
-        &= \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial b_1} 
-        = \textcolor{blue}{dZ1} \cdot 1 
+        &= \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}*\frac{\partial Z_1}{\partial b_1} \\
+        &= \textcolor{blue}{dZ1} * \frac{\partial Z_1}{\partial b_1} 
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{blue}{dZ1_{:, j}} * 1
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{blue}{dZ1} &= \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1} \\
-    &= \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}
-    = W2^T \cdot \textcolor{red}{dZ2} \cdot A1 \cdot (1 - A1)
+    \text{where } \textcolor{blue}{dZ1} &= \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1} \\
+    &= \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}
+    = W2^T \cdot \textcolor{red}{dZ2} * A1 \cdot (1 - A1)
 \end{align*}
 
 \end{array}
 $$
 
-2. When it is done complete the following code:
+2. With the dimensions of the matrices and vectors during the forward pass, what are the dimensions of the gradients during the backpropagation if we train on batches of data with `m` samples?
+- $dW_3: [4, 128]$
+- $db_3: [4, 1]$
+- $dW_2: [128, 128]$
+- $db_2: [128, 1]$
+- $dW_1: [128, 3]$
+- $db_1: [128, 1]$
+- $dZ_3, dA_3: [4, m]$
+- $dZ_2, dA_2: [128, m]$
+- $dZ_1, dA_1: [128, m]$
+
+3. When it is done complete the following code:
 
 ```python
     def back_propagation(X, y, parametres, activations):
