@@ -43,30 +43,10 @@ Where:
 - _Z_ is the weighted sum (linear combination)
 - _A_ is the output after applying the activation function (ReLU in this case)
 
-
-## Loss function and Scoring function
-A cost function and a scoring function quantify the quality of predictions. 
-
-Depending on your problem, you might want to use different functions. 
-
-For the remainder of the lesson, we will use the following loss function, the mean squared error (MSE) for regression: 
-$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
-
-and for the scoring function, the coefficient of determination ($R^2$):
-$$R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}$$
-
-It is possible to directly use the solutions provided by Scikit-learn: `mean_squared_error()` and `r2_score()`.
-
-## Initialization of the parameters and Forward Propagation
-We are going to build an MLP with **two hidden layers** of 128 neurons each. 
-
-What are the dimensions of the input and output?
-
-![](assets/labs/lab_AI/data/images/nn_3-128-128-4.svg){width=80%}{.center}
-
 #### Initialization of the parameters and Forward Propagation
 We are going to build an MLP with two hidden layers of 128 neurons each. What are the dimensions of the input and output?
 
+![](assets/labs/lab_AI/data/images/nn_3-128-128-4.svg){width=80%}{.center}
 
 ::: exercise 
 **Exercise 1**
@@ -181,17 +161,81 @@ The partial derivatives (gradient) of the loss with respect to the weights W and
 expressions that will be used for the gradient descent since W and b are what we want 
 to optimize during the training. Use the chain rule as in the first expression:
 
-$\frac{\partial \mathcal{L}}{\partial W_3} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} = ...$
+$$
+\begin{array}{ll}
+\text{Output layer 3:} & \\
+&\begin{align*}
+    &dW_3 = \frac{\partial \mathcal{L}}{\partial W_3}
+        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial W_3} 
+        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial W_3}
+        = \textcolor{green}{dZ3} \cdot A2^T
 
-$\frac{\partial \mathcal{L}}{\partial b_3} = ...$
+    \\[1em]
 
-$\frac{\partial \mathcal{L}}{\partial W_2} = ...$
+    &db_3 = \frac{\partial \mathcal{L}}{\partial b_3}
+        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial b_3} 
+        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial b_3}
+        = \textcolor{green}{dZ3} \cdot 1
+\end{align*}
 
-$\frac{\partial \mathcal{L}}{\partial b_2} = ...$
+\\[4em]
 
-$\frac{\partial \mathcal{L}}{\partial W_1} = ...$
+&\begin{align*}
+    \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3} = \frac{2}{m}(A3 - y) 
+\end{align*}
 
-$\frac{\partial \mathcal{L}}{\partial b_1} = ...$
+\\[1em]
+
+\text{Layer 2:} & \\
+&\begin{align*}
+    &dW2 = \frac{\partial \mathcal{L}}{\partial W_2}
+        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial W_2}
+        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial W_2}
+        = \textcolor{red}{dZ2} \cdot A1^T
+
+    \\[1em]
+
+    &db2 = \frac{\partial \mathcal{L}}{\partial b_2}
+        = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial b_2}
+        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial b_2}
+        = \textcolor{red}{dZ2} \cdot 1
+\end{align*}
+
+\\[4em]
+
+&\begin{align*}
+    \text{where } \textcolor{red}{dZ2} = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2} = W3^T \cdot \textcolor{green}{dZ3} \cdot A2 \cdot (1 - A2)
+\end{align*}
+
+\\[1em]
+
+\text{Layer 1:} & \\
+&\begin{align*}
+    dW1 = \frac{\partial \mathcal{L}}{\partial W_1}
+        & = \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}\cdot\frac{\partial Z_1}{\partial W_1} \\
+        & = \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial W_1}
+        = \textcolor{blue}{dZ1} \cdot X^T
+\end{align*}
+
+\\[1em]
+
+&\begin{align*}
+    db1 = \frac{\partial \mathcal{L}}{\partial b_1}
+        &= \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}\cdot\frac{\partial Z_1}{\partial b_1} \\
+        &= \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial b_1} 
+        = \textcolor{blue}{dZ1} \cdot 1 
+\end{align*}
+
+\\[4em]
+
+&\begin{align*}
+    \text{where } \textcolor{blue}{dZ1} &= \frac{\partial \mathcal{L}}{\partial A_3}\cdot\frac{\partial A_3}{\partial Z_3}\cdot\frac{\partial Z_3}{\partial A_2}\cdot\frac{\partial A_2}{\partial Z_2}\cdot\frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1} \\
+    &= \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial A_1}\cdot\frac{\partial A_1}{\partial Z_1}
+    = W2^T \cdot \textcolor{red}{dZ2} \cdot A1 \cdot (1 - A1)
+\end{align*}
+
+\end{array}
+$$
 
 2. When it is done complete the following code:
 
