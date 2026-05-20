@@ -174,16 +174,21 @@ The partial derivatives (gradient) of the loss with respect to the weights $W_i$
 The chain rule is a fundamental concept in calculus that allows us to compute the derivative of a composite function.
 
 ##### Batch training
+<div style="color: red;"> TODO: IS THIS CORRECT?
+
 In practice, we train our MLP on batches of data, meaning that several samples are processed simultaneously. This allows for more efficient computation and can lead to faster convergence during training.
 
 During batch training, the dimensions of the matrices and vectors are different since we train on batches of data. The input $X$ has dimensions $[3, m]$ where `m` is the batch size, and $Z_3$ and $A_3$ have dimensions $[4, m]$. However, the dimensions of the weights and bias remain the same since they are shared across all samples in the batch.
 
-<span style="color: red;"> TODO: Explain that because of the batch training, the gradients are computed as averages over the batch. This is why we have to introduce division by `m` and that we can replace the element-wise multiplication with a dot product. Because we are computing the average, the sum can be replaced with a dot product (which is more efficient).</span>
+</div>
 
 ##### Broadcasting
+<div style="color: red;"> TODO: IS THIS CORRECT?
 Broadcasting is a mechanism that allows operations to be performed on arrays of different shapes. It expands the smaller array to match the shape of the larger array during arithmetic operations. This is particularly useful in neural network computations where we often need to perform operations between arrays of different dimensions, such as adding a bias vector to a matrix of activations.
 
 For example, when we compute the weighted sum $Z = W.X + b$, if $W$ has dimensions $[128, 3]$, $X$ has dimensions $[3, m]$, and $b$ has dimensions $[128, 1]$, the addition of $b$ to the product $W.X$ is facilitated by broadcasting. The bias vector $b$ is  expanded to match the shape of the product $W.X$ giving a bias term of size $[128, m]$, allowing for element-wise addition without the need for explicit reshaping.
+
+</div>
 
 ::: exercise 
 **Exercise 3**
@@ -198,23 +203,26 @@ $$
 \text{Output layer 3:} & \\
 &\begin{align*}
     &dW_3 = \frac{\partial \mathcal{L}}{\partial W_3}
-        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial W_3} 
-        = \textcolor{green}{dZ3} * \frac{\partial Z_3}{\partial W_3}
-        = \frac{1}{m}\textcolor{green}{dZ3} \cdot A_2^T
+        = \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3}\cdot \frac{\partial Z_3}{\partial W_3} 
+        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial W_3}
+        = \textcolor{green}{dZ3} \cdot A_2^T
 
     \\[1em]
 
     &db_3 = \frac{\partial \mathcal{L}}{\partial b_3}
-        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial b_3} 
-        = \textcolor{green}{dZ3} * \frac{\partial Z_3}{\partial b_3}
-        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{green}{dZ3_{:, j}} * 1 \\
-        &\text{(transforming dZ3 from [4, m] to [4, 1] by averaging over the batch dimension m)}
+        = \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial b_3} 
+        = \textcolor{green}{dZ3} \cdot \frac{\partial Z_3}{\partial b_3}
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{green}{dZ3_{:, j}} 
+        &\text{\textcolor{red}{TODO: I don't understand why there is sum in db3}}
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial A_3}* \frac{\partial A_3}{\partial Z_3} = \frac{2}{m}(A_3 - y) 
+    \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial Z_3}  =& \frac{\partial \mathcal{L}}{\partial A_3} 
+    \cdot \frac{\partial A_{3}}{\partial Z_3} \\ 
+    &=\frac{2}{m}\sum_{i=1}^{m} (A_{3,:i} - y_i) \\
+    &= \frac{2}{m}(A_3 - y) \text{\textcolor{red}{TODO:  I don't understand why the sum disappears.}}
 \end{align*}
 
 \\[1em]
@@ -222,28 +230,40 @@ $$
 \text{Layer 2:} & \\
 &\begin{align*}
     &dW2 = \frac{\partial \mathcal{L}}{\partial W_2}
-        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial W_2}
-        = \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial W_2}
-        = \frac{1}{m}\textcolor{red}{dZ2} \cdot A1^T
+        = \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2} \cdot \frac{\partial A_2}{\partial Z_2} \cdot \frac{\partial Z_2}{\partial W_2}
+        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial W_2}
+        = \textcolor{red}{dZ2} \cdot A_1^T
 
     \\[1em]
 
     &db2 = \frac{\partial \mathcal{L}}{\partial b_2}
-        = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial b_2}
-        = \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial b_2}
-        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{red}{dZ2_{:, j}} * 1
+        = \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2} \cdot \frac{\partial A_2}{\partial Z_2} \cdot \frac{\partial Z_2}{\partial b_2}
+        = \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial b_2}
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{red}{dZ2_{:, j}} \\
+        &\text{\textcolor{red}{TODO: I don't understand why there is sum in db2}}
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{red}{dZ2} = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2} = W_3^T \cdot \textcolor{green}{dZ3} * A_2 \cdot (1 - A_2)
+    \text{where } \textcolor{red}{dZ2} &= \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2}
+    \cdot \frac{\partial A_2}{\partial Z_2} \\
+    &= \textcolor{green}{dZ3} \cdot W_3 \cdot diag(\sigma'(z_1), \sigma'(z_2), ..., \sigma'(z_{128})) 
+    \text{\textcolor{red}{TODO: I think because the activation is applied neuron-wise? }} 
+    \\
+    
+    &= \textcolor{green}{dZ3} \cdot W_3 \odot A_2 \odot (1 - A_2) 
+    \text{\textcolor{red}{TODO: matrix product by diag is equivalent to Hadamard product (element-wise) }} \\
+    &= W_3^T \cdot \textcolor{green}{dZ3} \odot A_2 \odot (1 - A_2) \\
+    &\color{red} \text{TODO: I don't understand why we can swap dZ3 and W3 like this}
 \end{align*}
 
 \\[1em]
 
-\text{Layer 1:} & \\
+\textcolor{red}{\text{Layer 1: }} & \\
+\textcolor{red}{\text{Everything is false here }} \\
 &\begin{align*}
+
     dW1 = \frac{\partial \mathcal{L}}{\partial W_1}
         & = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}*\frac{\partial Z_1}{\partial W_1} \\
         & = \textcolor{blue}{dZ1} * \frac{\partial Z_1}{\partial W_1}
