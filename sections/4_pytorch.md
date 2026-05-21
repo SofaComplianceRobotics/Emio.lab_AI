@@ -139,7 +139,7 @@ The alogrithm for the `score` function is:
 2. Evaluate the model using the dataset and model you want:
 
     Dataset path: 
-        #input("pytorch_eval_dataset", "data/results/YOUR_MODEL.pth", "data/results/model_pytorch_sphere.pth")
+        #input("pytorch_eval_dataset", "data/results/YOUR_DATASET.csv", "data/results/blueleg_beam_cube1331.csv")
 
     <br/>
 
