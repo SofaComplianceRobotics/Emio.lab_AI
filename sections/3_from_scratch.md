@@ -261,30 +261,30 @@ $$
 \\[1em]
 
 \textcolor{red}{\text{Layer 1: }} & \\
-\textcolor{red}{\text{Everything is false here }} \\
+&\textcolor{red}{\text{TODO: Same problems here than for layer 2}} \\
 &\begin{align*}
 
     dW1 = \frac{\partial \mathcal{L}}{\partial W_1}
-        & = \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}*\frac{\partial Z_1}{\partial W_1} \\
-        & = \textcolor{blue}{dZ1} * \frac{\partial Z_1}{\partial W_1}
-        = \frac{1}{m} \textcolor{blue}{dZ1} \cdot X^T
+        & = \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2} \cdot \frac{\partial A_2}{\partial Z_2} \cdot \frac{\partial Z_2}{\partial A_1} \cdot \frac{\partial A_1}{\partial Z_1} \cdot \frac{\partial Z_1}{\partial W_1} \\
+        & = \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial W_1}
+        = \textcolor{blue}{dZ1} \cdot X^T
 \end{align*}
 
 \\[1em]
 
 &\begin{align*}
     db1 = \frac{\partial \mathcal{L}}{\partial b_1}
-        &= \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}*\frac{\partial Z_1}{\partial b_1} \\
-        &= \textcolor{blue}{dZ1} * \frac{\partial Z_1}{\partial b_1} 
-        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{blue}{dZ1_{:, j}} * 1
+        &= \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2} \cdot \frac{\partial A_2}{\partial Z_2} \cdot \frac{\partial Z_2}{\partial A_1} \cdot \frac{\partial A_1}{\partial Z_1} \cdot \frac{\partial Z_1}{\partial b_1} \\
+        &= \textcolor{blue}{dZ1} \cdot \frac{\partial Z_1}{\partial b_1} 
+        = \frac{1}{m}\sum_{j=1}^{m} \textcolor{blue}{dZ1_{:, j}}
 \end{align*}
 
 \\[4em]
 
 &\begin{align*}
-    \text{where } \textcolor{blue}{dZ1} &= \frac{\partial \mathcal{L}}{\partial A_3}*\frac{\partial A_3}{\partial Z_3}*\frac{\partial Z_3}{\partial A_2}*\frac{\partial A_2}{\partial Z_2}*\frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1} \\
-    &= \textcolor{red}{dZ2} * \frac{\partial Z_2}{\partial A_1}*\frac{\partial A_1}{\partial Z_1}
-    = W2^T \cdot \textcolor{red}{dZ2} * A1 \cdot (1 - A1)
+    \text{where } \textcolor{blue}{dZ1} &= \frac{\partial \mathcal{L}}{\partial A_3}\cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2} \cdot \frac{\partial A_2}{\partial Z_2} \cdot \frac{\partial Z_2}{\partial A_1} \cdot \frac{\partial A_1}{\partial Z_1} \\
+    &= \textcolor{red}{dZ2} \cdot \frac{\partial Z_2}{\partial A_1} \cdot \frac{\partial A_1}{\partial Z_1}
+    = W2^T \cdot \textcolor{red}{dZ2} \odot A1 \odot (1 - A1)
 \end{align*}
 
 \end{array}
