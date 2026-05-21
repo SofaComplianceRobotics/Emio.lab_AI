@@ -391,16 +391,13 @@ You can find the rest of the code by clicking here :
 
 1. Complete the `train`function of `custom_MLP.py`
 
-2. Train it, using the `train_model.py`: 
-```bash
-python train_model.py <model_type> <dataset_path>
-```
+    #open-button(file="assets/labs/lab_AI/modules/custom_MLP.py")
 
-- model_type: `custom`, `scikit-learn`, `pytorch`
-- dataset_path: `PATH/TO/DATASET.csv`
-- the trained model save path is `data/results/model_MODELTYPE.ext`
-    - pytorch will save a  `pth` file
-    - scikit-learn and custom will save `joblib` files
+2. Train it, using the `train_model.py`: 
+
+    #input("custom_training_dataset", "data/results/YOUR_DATASET.csv", "data/results/blueleg_beam_cube1331.csv")
+
+    #python-button(file="assets/labs/lab_AI/train_model.py", pyargs=["custom", "custom_training_dataset"])
 
 ::: 
 
@@ -410,22 +407,22 @@ In this section, just like in the MLP with scikitlearn, you will first evaluate 
 #### Evaluate your model Without the simulation
 ::: exercise
 **Exercise 5**
-1. Implement the `score` in `modules/pytorch_MLP.py`.
+1. Implement the `score` in `modules/custom_MLP.py`.
 Use the r2_score_pytorch` function.
 
-2. Evaluate it by calling
-```bash
-python evaluate_model.py <model_type> <dataset_path> <model_path>
-```
+#open-button(file="assets/labs/lab_AI/modules/custom_MLP.py")
 
-- model_type: `custom`, `scikit-learn`, `pytorch`
-- dataset_path: `PATH/TO/DATASET`
-    - pytorch expects `pth` files
-    - scikit-learn and custom expct `joblib` files
-- model_path: `PATH/TO/MODEL`
-    - pytorch expects `pth` files
-    - scikit-learn and custom expct `joblib` files
-- the trained model save path is `data/results/model_MODELTYPE.ext`
+2. Evaluate it using the dataset and model you wan:
+
+    Dataset:
+        #input("custom_eval_dataset", "data/results/YOUR_DATASET.csv", "data/results/blueleg_beam_cube1331.csv")
+
+    <br/>
+
+    Model: 
+    #input("custom_eval_model", "data/results/YOUR_MODEL.joblib", "data/results/model_custom.joblib")
+
+    #python-button(file="assets/labs/lab_AI/evaluate_model.py", pyargs=["custom", "custom_eval_dataset", "custom_eval_model"])
 
 :::
 
