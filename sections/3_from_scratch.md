@@ -168,10 +168,54 @@ it backward through the network's layers. This is because the input of layer _i_
 
 The partial derivatives (gradient) of the loss with respect to the weights $W_i$ and biais $b_i$ are used to update them via gradient descent.
 
+Backpropagation is used to train the MLP by computing the gradients of the loss ($\mathcal{L}(Y,\hat{Y}))$ with respect to all parameters ($(W_1,b_1,W_2,b_2,W_3,b_3)$). 
+Since each layer output is used as the next layer input, the loss depends on early-layer parameters through intermediate variables ($(Z_1,A_1,Z_2,A_2,Z_3)$). 
+
+Backpropagation computes these gradients efficiently by propagating an “error signal” from the output layer back to the first hidden layer, then using gradient descent to update the parameters.
+
 ##### Chain Rule
 <span style="color: red;"> TODO: Explain the chain rule in derivatives calulation for backpropagation </span>
 
 The chain rule is a fundamental concept in calculus that allows us to compute the derivative of a composite function.
+
+#### Chain rule (key idea)
+
+Backpropagation relies on the **chain rule**: if a variable depends on another through an intermediate quantity, derivatives multiply along the path. For a simple composition,
+
+$$
+J = f(a), \qquad a = g(z),
+$$
+
+the chain rule gives
+
+$$
+\frac{\partial J}{\partial z} = \frac{\partial J}{\partial a}\,\frac{\partial a}{\partial z}.
+$$
+
+In our MLP, the loss $\mathcal{L}(Y,\hat{Y})$ depends on the output $\hat{Y}$, which depends on $(Z_3,A_2)$, which depends on $(Z_2,A_1)$, etc. This is why we compute gradients **from the last layer to the first layer**.
+
+We define the error signals (one per layer):
+
+$$
+\delta_3 = \frac{\partial \mathcal{L}}{\partial Z_3}, \qquad
+\delta_2 = \frac{\partial \mathcal{L}}{\partial Z_2}, \qquad
+\delta_1 = \frac{\partial \mathcal{L}}{\partial Z_1}.
+$$
+
+Because the output layer is linear ($hat{Y}=Z_3$), we have:
+
+$$
+\delta_3 = \frac{\partial \mathcal{L}}{\partial \hat{Y}}.
+$$
+
+Then, applying the chain rule through the network gives the backward recursion:
+
+$$
+\delta_2 = (W_3^\top \delta_3)\ \odot\ \sigma'(Z_2), \\
+\delta_1 = (W_2^\top \delta_2)\ \odot\ \sigma'(Z_1),
+$$
+
+where $\odot$ is element-wise multiplication and $\sigma'(\cdot)$ is the derivative of the activation function (for ReLU, $\sigma'(z)=1$ if $z>0$ and $0$ otherwise).
 
 ##### Batch training
 <div style="color: red;"> TODO: IS THIS CORRECT?
@@ -181,6 +225,15 @@ In practice, we train our MLP on batches of data, meaning that several samples a
 During batch training, the dimensions of the matrices and vectors are different since we train on batches of data. The input $X$ has dimensions $[3, m]$ where `m` is the batch size, and $Z_3$ and $A_3$ have dimensions $[4, m]$. However, the dimensions of the weights and bias remain the same since they are shared across all samples in the batch.
 
 </div>
+
+
+In practice, we train the MLP on batches: instead of processing one sample at a time, we stack m samples together and run the same computations in parallel.
+
+With the samples-as-columns convention, the batch input is $X \in \mathbb{R}^{3 \times m}$. The network outputs a batch of predictions $\hat{Y} \in \mathbb{R}^{4 \times m}$
+(and at the last layer $Z_3 \in \mathbb{R}^{4 \times m}$, $A_3 \in \mathbb{R}^{4 \times m}$; for regression, $A_3 = Z_3$). 
+The parameters do not change shape: for example $W_3 \in \mathbb{R}^{4 \times 128}$ and $b_3 \in \mathbb{R}^{4 \times 1}$ are shared across the whole batch, and the bias $b_3$
+is simply broadcast (added to every one of the m columns) when computing $Z_3 = W_3 A_2 + b_3$.
+
 
 ##### Broadcasting
 <div style="color: red;"> TODO: IS THIS CORRECT?
