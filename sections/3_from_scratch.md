@@ -174,11 +174,9 @@ Since each layer output is used as the next layer input, the loss depends on ear
 Backpropagation computes these gradients efficiently by propagating an “error signal” from the output layer back to the first hidden layer, then using gradient descent to update the parameters.
 
 ##### Chain Rule
-<span style="color: red;"> TODO: Explain the chain rule in derivatives calulation for backpropagation </span>
 
 The chain rule is a fundamental concept in calculus that allows us to compute the derivative of a composite function.
 
-#### Chain rule (key idea)
 
 Backpropagation relies on the **chain rule**: if a variable depends on another through an intermediate quantity, derivatives multiply along the path. For a simple composition,
 
@@ -218,14 +216,6 @@ $$
 where $\odot$ is element-wise multiplication and $\sigma'(\cdot)$ is the derivative of the activation function (for ReLU, $\sigma'(z)=1$ if $z>0$ and $0$ otherwise).
 
 ##### Batch training
-<div style="color: red;"> TODO: IS THIS CORRECT?
-
-In practice, we train our MLP on batches of data, meaning that several samples are processed simultaneously. This allows for more efficient computation and can lead to faster convergence during training.
-
-During batch training, the dimensions of the matrices and vectors are different since we train on batches of data. The input $X$ has dimensions $[3, m]$ where `m` is the batch size, and $Z_3$ and $A_3$ have dimensions $[4, m]$. However, the dimensions of the weights and bias remain the same since they are shared across all samples in the batch.
-
-</div>
-
 
 In practice, we train the MLP on batches: instead of processing one sample at a time, we stack m samples together and run the same computations in parallel.
 
@@ -274,8 +264,8 @@ $$
 &\begin{align*}
     \text{where } \textcolor{green}{dZ3} = \frac{\partial \mathcal{L}}{\partial Z_3}  =& \frac{\partial \mathcal{L}}{\partial A_3} 
     \cdot \frac{\partial A_{3}}{\partial Z_3} \\ 
-    &=\frac{2}{m}\sum_{i=1}^{m} (A_{3,:i} - y_i) \\
-    &= \frac{2}{m}(A_3 - y) \text{\textcolor{red}{TODO:  I don't understand why the sum disappears.}}
+    &=\frac{2}{m}\sum_{i=1}^{m} (a^{(3)}_i - y_i) & \text{ where }a^{(3)}_i(resp. y_i) \text{ is the i-th column of } A_3  (resp. Y)\\
+    &= \frac{2}{m}(A_3 - Y) 
 \end{align*}
 
 \\[1em]
@@ -301,12 +291,10 @@ $$
 &\begin{align*}
     \text{where } \textcolor{red}{dZ2} &= \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2}
     \cdot \frac{\partial A_2}{\partial Z_2} \\
-    &= \textcolor{green}{dZ3} \cdot W_3 \cdot diag(\sigma'(z_1), \sigma'(z_2), ..., \sigma'(z_{128})) 
-    \text{\textcolor{red}{TODO: I think because the activation is applied neuron-wise? }} 
+    &= \textcolor{green}{dZ3} \cdot W_3 \odot A_2 \odot (1 - A_2) \\
+    &= \textcolor{green}{dZ3} \cdot W_3 \cdot diag(\sigma'(z_1), \sigma'(z_2), ..., \sigma'(z_{128}))
     \\
     
-    &= \textcolor{green}{dZ3} \cdot W_3 \odot A_2 \odot (1 - A_2) 
-    \text{\textcolor{red}{TODO: matrix product by diag is equivalent to Hadamard product (element-wise) }} \\
     &= W_3^T \cdot \textcolor{green}{dZ3} \odot A_2 \odot (1 - A_2) \\
     &\color{red} \text{TODO: I don't understand why we can swap dZ3 and W3 like this}
 \end{align*}
