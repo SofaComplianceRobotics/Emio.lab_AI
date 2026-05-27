@@ -291,9 +291,9 @@ $$
 &\begin{align*}
     \text{where } \textcolor{red}{dZ2} &= \frac{\partial \mathcal{L}}{\partial A_3} \cdot \frac{\partial A_3}{\partial Z_3} \cdot \frac{\partial Z_3}{\partial A_2}
     \cdot \frac{\partial A_2}{\partial Z_2} \\
+    &= \textcolor{green}{dZ3} \cdot W_3 \cdot A_2 \odot (1 - A_2) \\
+    &= \textcolor{green}{dZ3} \cdot W_3 \cdot diag(\sigma'(z_1), \sigma'(z_2), ..., \sigma'(z_{128})) \\
     &= \textcolor{green}{dZ3} \cdot W_3 \odot A_2 \odot (1 - A_2) \\
-    &= \textcolor{green}{dZ3} \cdot W_3 \cdot diag(\sigma'(z_1), \sigma'(z_2), ..., \sigma'(z_{128}))
-    \\
     
     &= W_3^T \cdot \textcolor{green}{dZ3} \odot A_2 \odot (1 - A_2) \\
     &\color{red} \text{TODO: I don't understand why we can swap dZ3 and W3 like this}
