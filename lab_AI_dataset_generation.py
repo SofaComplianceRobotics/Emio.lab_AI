@@ -35,9 +35,9 @@ class TargetController(Sofa.Core.Controller):
 
         self.animationSteps = steps 
         self.animationStep = self.animationSteps
-        self.motorsAngle = [np.copy(self.emio.getChild(f'Motor{i}').JointActuator.value.value) for i in range(4)]
+        self.motorsAngle = [np.copy(self.emio.getChild(f'Motor{i}').JointActuator.value.value) for i in range(4)] if direct else [np.copy(self.emio.getChild(f'Motor{i}').JointActuator.angle.value) for i in range(4)]
         self.motorsAngleGoals=self.targetsPosition[self.targetIndex]
-        self.motorStep = [(self.motorsAngleGoals[i]-self.emio.getChild(f'Motor{i}').JointActuator.value.value)/(self.animationSteps-1) for i in range(4)]
+        self.motorStep = [(self.motorsAngleGoals[i]-self.emio.getChild(f'Motor{i}').JointActuator.value.value)/(self.animationSteps-1) for i in range(4)] if direct else []
 
         self.direct = direct
 
@@ -61,7 +61,7 @@ class TargetController(Sofa.Core.Controller):
                     self.animationStep = self.animationSteps
                     self.effector.effectorGoal = [list(self.targetsPosition[self.targetIndex]) + [0, 0, 0, 1]]
                     self.targetReached = False
-        elif self.assembly.done:
+        elif self.direct and self.assembly.done:
             self.animationStep -= 1
             if self.targetIndex >= 0 and self.animationStep <= 0:
                 self.writeToCSVFile()

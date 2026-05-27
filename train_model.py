@@ -40,9 +40,8 @@ def main():
 
 
     model_type = args.model_type.lower()
-    dataset_path = args.dataset_path
+    dataset_path = os.path.join(os.path.dirname(__file__), args.dataset_path)
     learn_from_real = False
-
 
     if len(sys.argv) == 4:
         learn_from_real = args.from_real is not None

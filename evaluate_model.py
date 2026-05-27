@@ -22,18 +22,29 @@ def evaluate_sklearn_model(dataset_path, model_path):
     print(f"R2 score (scikit-learn): {evaluate_model(mlp, dataset_path)}")
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: python evaluate_model.py <model_type> <dataset_path> <model_path>")
-        sys.exit(1)
-    model_type = sys.argv[1].lower()
-    dataset_path = sys.argv[2]
-    model_path = sys.argv[3]
+    import argparse, sys
+    parser=argparse.ArgumentParser()
+    parser.add_argument("model_type", type=str, choices=["custom", "scikit-learn", "pytorch"], help="Type of model that is evaluated")
+    parser.add_argument("dataset_path", type=str, help="Path to the dataset starting from the lab folder")
+    parser.add_argument("model_path", type=str, help="Path to the model to evaluate")
+
+    try:
+        args = parser.parse_args()
+    finally:
+        print(f"Arguments: model_type: {args.model_type}, dataset: {args.dataset_path}, model file: {args.model_path}")
+    
+    model_type = args.model_type.lower()
+    dataset_path = os.path.join(os.path.dirname(__file__), args.dataset_path)
+    model_path = os.path.join(os.path.dirname(__file__), args.model_path)
+
     if not os.path.exists(dataset_path):
         print(f"Dataset file not found: {dataset_path}")
         sys.exit(1)
+
     if not os.path.exists(model_path):
         print(f"Model file not found: {model_path}")
         sys.exit(1)
+        
     if model_type == "custom":
         evaluate_custom_model(dataset_path, model_path)
     elif model_type == "pytorch":
